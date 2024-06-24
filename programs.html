@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html> <link rel="stylesheet" href="styless.css"> <link rel="icon" href="penisforeskinicon.jpg"> 
+<title>Penisfore.skin</title>
+<head>
+<div class="topnav">
+	<img src="penisforeskinicon.jpg" alt="penisforeskin" id="bestimage" style='animation-name:anime; animation-duration: 1s;animation-iteration-count: infinite;'onclick="new Audio('killyourself.mp3').play()">
+	<a href="programs.html" class="hoverable active">Programs</a>
+	<a href="reviews.html" class="hoverable">Reviews</a>
+    <a href="games.html" class="hoverable">Games</a>
+    <a href="penisforeskin.html" class="hoverable">Home</a>
+</div>
+<h1 id="title">PENISFORESKIN.COM</h1>
+<hr class="liner">
+<hr class="liner">
+<ul class="other-pages">
+</ul>
+<br>
+<br>
+<h2 class="labeler">messaging app server</h2>
+<br>
+<br>
+<pre class="scroll">
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#define DEFAULT_PORT "27015"
+#define DEFAULT_BUFLEN 512
+
+#include &ltwindows.h>
+#include &ltwinsock2.h>
+#include &ltws2tcpip.h>
+#include &ltiphlpapi.h>
+
+#include &ltstdio.h>
+#include &ltstdlib.h>
+#include &ltstring.h>
+#include &ltstdbool.h>
+#include &ltprocess.h>
+
+FILE *users;//user database file for account making and logging in
+FILE *usernames;//list of taken usernames
+
+struct user {
+    SOCKET connection;//socket user is connected to
+    char username[20];//their username
+};
+
+struct user *connecters;//dynamic list of connected users
+int length=0;//length of connected users
+
+struct user* remove_element(struct user* array, int sizeOfArray, int indexToRemove){
+    struct user* temp = malloc((sizeOfArray - 1) * sizeof(struct user)); // allocate an array with a size 1 less than the current one
+
+    if (indexToRemove != 0)
+        memcpy(temp, array, indexToRemove * sizeof(struct user)); // copy everything BEFORE the index
+
+    if (indexToRemove != (sizeOfArray - 1))
+        memcpy(temp+indexToRemove, array+indexToRemove+1, (sizeOfArray - indexToRemove - 1) * sizeof(struct user)); // copy everything AFTER the index
+
+    free (array);
+    return temp;
+}
+
+unsigned __stdcall ClientSession(void *data){//multithreading, gonna  be real  with you I have no idea how this code works
+    SOCKET ClientSocket = (SOCKET)data;// Process the client.
+
+    //message receiving setup stuff
+    char message[DEFAULT_BUFLEN];
+    int buffer;//function recorder
+    int buffer2;//another function  recorder
+    int iSendResult;
+    int messageSize = DEFAULT_BUFLEN;
+    char sender[100];//user that  is sending stuff
+
+    //login shit
+    bool logger=false;
+    char accounter[1];//records if  they have an account
+
+    while (!logger){
+
+        buffer2=recv(ClientSocket, accounter, 1, 0);//checking if they need to make a new account or can log in
+        if (!(buffer2>=0)){
+            printf("recv failed: %d\n", WSAGetLastError());
+            closesocket(ClientSocket);
+            return 1;
+        }
+
+        if (accounter[0]=='N'){
+            users=fopen("users.txt","a");//opens the user recording file
+            char holder[2][20];//holds the login info
+            while (true){
+                usernames=fopen("usernames.txt","r");//opens the username list file
+                bool taken=false;
+                buffer2=recv(ClientSocket, holder[0], 20, 0);//getting the username
+                if (!(buffer2>=0)){
+                    printf("recv failed: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    return 1;
+                }
+
+                if (strcmp(holder[0]," ")==0){//checks if it's just a timeout space
+                    memset(holder[0], 0, sizeof(holder[0]));//resetting login info if it's just a space
+                    continue;
+                }
+
+                //checks if the username is taken
+                char checker[100];
+                while(fgets(checker, 100, usernames)) {
+                    if (checker[strlen(checker)-1]== '\n') checker[strlen(checker)-1]='\0';
+                    if (strcmp(checker,holder[0])==0){
+                        taken=true;
+                        char denier[]="taken";
+                        send(ClientSocket, denier, (int)strlen(denier), 0);
+                        break;
+                    }
+                }
+                fclose(usernames);
+                if (taken) continue;
+                char accepter[]="okie-dokie";
+                send(ClientSocket, accepter, (int)strlen(accepter), 0);
+                break;
+            }
+
+            while (true){
+                buffer2=recv(ClientSocket, holder[1], 20, 0);//getting the login info
+                if (!(buffer2>=0)){
+                    printf("recv failed: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    return 1;
+                }
+
+                if (strcmp(holder[1]," ")==0){
+                    memset(holder[1], 0, sizeof(holder[1]));//resetting login info if it's just a space
+                    continue;
+                }
+                break;
+            }
+            //recording the new account
+            char account[] = " username: ";
+            strcat(account,holder[0]);
+            strcat(account," password: ");
+            strcat(account,holder[1]);
+            strcat(account,"\n");
+            fprintf(users,account);//recording  login info
+            strcat(holder[0],"\n");
+            usernames=fopen("usernames.txt","a");
+            fprintf(usernames,holder[0]);//recording the username
+            fclose(users);
+            fclose(usernames);
+        }
+
+        if (accounter[0]=='Y'){
+            char holder[2][20];//stores login info
+            while (true){
+                buffer2=recv(ClientSocket, holder[0], 20, 0);//getting the login info
+                if (!(buffer2>=0)){
+                    printf("recv failed: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    return 1;
+                }
+
+                if (strcmp(holder[0]," ")==0){
+                    memset(holder[0], 0, sizeof(holder[0]));//resetting login info if it's just a space
+                    continue;
+                }
+                break;
+            }
+            while (true){
+                buffer2=recv(ClientSocket, holder[1], 20, 0);//getting the login info
+                if (!(buffer2>=0)){
+                    printf("recv failed: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    return 1;
+                }
+
+                if (strcmp(holder[1]," ")==0){
+                    memset(holder[1], 0, sizeof(holder[1]));//resetting login info if it's just a space
+                    continue;
+                }
+                break;
+            }
+
+            char account[] = " username: ";
+            strcat(account,holder[0]);
+            strcat(account," password: ");
+            strcat(account,holder[1]);
+            printf("%s\n",account);
+
+            char accountBuffer[100];
+            bool noper=false;
+            users=fopen("users.txt","r");
+            while (fgets(accountBuffer, 100, users)){
+                if (accountBuffer[strlen(accountBuffer)-1]== '\n') accountBuffer[strlen(accountBuffer)-1]='\0';//checks if last character is newline
+                if (strcmp(account,accountBuffer)==0){
+                    //login confirmation stuff
+                    logger=true;
+                    send(ClientSocket, "Y", 1, 0);//yes they logged in right
+                    printf("Logged in\n");
+                    length++;
+                    connecters=realloc(connecters,length*sizeof(struct user));
+                    struct user newGuy = {
+                        .connection=ClientSocket
+                    };
+                    memcpy(newGuy.username, holder[0], 20);
+                    connecters[length-1]=newGuy;
+                    fclose(users);
+                    strcpy(sender,holder[0]);
+                    noper=true;
+                    break;
+                }
+            }
+
+            if (!noper) send(ClientSocket, "N", 1, 0);//no they logged in wrong
+            memset(holder[0], 0, sizeof(holder[0]));//resetting the login info
+            memset(holder[1], 0, sizeof(holder[1]));//resetting the login info
+        }
+    }
+
+    // Receive until the peer shuts down the connection
+    do {
+        memset(message, 0, sizeof(message));//resetting the message
+        buffer = recv(ClientSocket, message, messageSize, 0);//receiving  the message
+        if (buffer > 0) {
+            if (strcmp(message," ")==0) continue;
+            printf("%s\n",message);//prints message they sent
+            char receiver[50];
+            memset(receiver, 0, sizeof(receiver));//resetting this because for some reason it doesn't work when I don't
+            while (true){
+                buffer2=recv(ClientSocket, receiver, 20, 0);//receiving  the receiver
+                if (!(buffer2>=0)){
+                    printf("recv failed: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    return 1;
+                }
+                if (strcmp(receiver," ")==0){
+                    memset(receiver, 0, sizeof(receiver));//resetting the receiver if it's just a space
+                    continue;
+                }
+                break;
+            }
+            //searches for user to send the message to
+            for (int i=0;i&ltlength;i++){
+                if (strcmp(connecters[i].username,receiver)==0){
+                    iSendResult = send(connecters[i].connection, sender, sizeof(sender), 0);
+                    if (iSendResult == SOCKET_ERROR) {
+                        printf("send failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+                    //send  message to correct person
+                    iSendResult = send(connecters[i].connection, message, sizeof(message), 0);
+                    if (iSendResult == SOCKET_ERROR) {
+                        printf("send failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+                }
+            }
+        } else if (buffer == 0)
+            printf("Connection closing...\n");
+        else {
+            printf("recv failed: %d\n", WSAGetLastError());
+            for (int i=0;i&ltlength;i++){
+                if (connecters[i].connection==ClientSocket){
+                    connecters = remove_element(connecters, length, i);
+                    length--;
+                }
+            }
+            closesocket(ClientSocket);
+            return 1;
+        }
+
+    } while (buffer > 0);
+    printf("thread ended\n");
+    return 0;
+}
+
+int main(){
+    connecters=(struct user*)malloc(length * sizeof(struct user));//list of connected users
+
+    //winsock setup variables
+    WSADATA wsaData;
+    int buffer;
+    struct sockaddr_in service;//struct that stores ip address
+
+    // Initialize Winsock
+    buffer = WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (buffer != 0) {
+        printf("WSAStartup failed: %d\n", buffer);
+        return 1;
+    }
+
+    // Create a SOCKET for listening for
+    // incoming connection requests
+    SOCKET ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ListenSocket == INVALID_SOCKET) {
+        wprintf(L"socket function failed with error: %u\n", WSAGetLastError());
+        WSACleanup();
+        return 1;
+    }
+
+    // The sockaddr_in structure specifies the address family,
+    // IP address, and port for the socket that is being bound.
+    service.sin_family = AF_INET;
+    service.sin_addr.s_addr = inet_addr("192.168.1.21");//ip to bind to
+    service.sin_port = htons(27015);//port
+
+
+    // Bind the socket.
+    buffer = bind(ListenSocket, (SOCKADDR *) &service, sizeof (service));
+    if (buffer == SOCKET_ERROR) {
+        wprintf(L"bind failed with error %u\n", WSAGetLastError());
+        closesocket(ListenSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    //listening for incoming socket
+    while (true){
+        if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
+            printf( "Listen failed with error: %d\n", WSAGetLastError() );
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+        SOCKET ClientSocket;
+        ClientSocket = INVALID_SOCKET;
+
+        // Accept a client socket
+        ClientSocket = accept(ListenSocket, NULL, NULL);
+        printf("%llu\n",ClientSocket);//printing the client socket
+        if (ClientSocket == INVALID_SOCKET) {
+            printf("accept failed: %d\n", WSAGetLastError());
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+        // Create a new thread for the accepted client (also pass the accepted client socket).
+        unsigned threadID;
+        (HANDLE)_beginthreadex(NULL, 0, &ClientSession, (void*)ClientSocket, 0, &threadID);
+    }
+
+    // cleanup
+    WSACleanup();
+    printf("socket adventures");
+    return 0;
+}
+
+
+    </pre>
+    <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p class="blurbs">This is server for a messaging app written in pure C using the winsock library. It has a login system that allows users to sign in with a username of their choice (provided that username isn't taken) and password. It also has an address system that determines which users are signed in. The app works by a user sending a message, indicating who they want to send the message to, and the server sends that message to the person addressed, provided they are online and signed in. A very simple but effective chat app, similar to the chat apps of the early 90s</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<h2 class="labeler">messaging app</h2>
+<br>
+<br>
+<pre class="scroll">
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#define DEFAULT_BUFLEN 512
+#define DEFAULT_PORT "27015"
+
+#include &ltstdio.h>
+#include &ltstdlib.h>
+#include &ltstdbool.h>
+#include &ltstring.h>
+#include &lttime.h>
+#include &ltprocess.h>
+
+#include &ltwindows.h>
+#include &ltwinsock2.h>
+#include &ltws2tcpip.h>
+#include &ltiphlpapi.h>
+
+
+void delay(int number_of_seconds){
+    int milli_seconds = 1000 * number_of_seconds;// Converting time into milli_seconds
+    clock_t start_time = clock();// Storing start time
+    while (clock() < start_time + milli_seconds);// looping till required time is not achieved
+}
+
+unsigned __stdcall ClientSession(void *data){//multithreading to stop timeout bug
+    SOCKET ConnectSocket = (SOCKET)data;// Process the client.
+    char message[]=" ";//blank message to send server
+    int buffer;
+    while (true){
+        delay(240);//delay of 4 minutes
+        buffer = send( ConnectSocket, message, (int)strlen(message), 0 );//sending server a blank message to keep connection going
+        if (buffer == SOCKET_ERROR) {
+            printf("send failed with error: %d\n", WSAGetLastError());
+            closesocket(ConnectSocket);
+            WSACleanup();
+            return 1;
+        }
+    }
+    return 0;
+}
+
+unsigned __stdcall messageListener(void *data){//multithreading to receive messages
+    SOCKET ConnectSocket = (SOCKET)data;// Process the client.
+    char message[DEFAULT_BUFLEN];//message holder
+    char sender[50];
+    int buffer;
+    while (true){
+        recv(ConnectSocket, sender, DEFAULT_BUFLEN, 0);//getting the user
+        recv(ConnectSocket, message, DEFAULT_BUFLEN, 0);//getting the message
+        strcat(sender," : ");
+        strcat(sender,message);
+        printf("%s\n",sender);
+        memset(message, 0, sizeof(message));//resetting the message
+        memset(sender, 0, sizeof(sender));//resetting the message
+    }
+    return 0;
+}
+
+int main(int argc,char **argv){
+    WSADATA wsaData;
+    SOCKET ConnectSocket = INVALID_SOCKET;// connecting socket
+
+    char message[DEFAULT_BUFLEN];//message holder
+
+    char receive[DEFAULT_BUFLEN];//received message storage
+    int buffer;
+
+    // Initialize Winsock
+    buffer = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (buffer != NO_ERROR) {
+        wprintf(L"WSAStartup function failed with error: %d\n", buffer);
+        return 1;
+    }
+
+    // Create a SOCKET for connecting to server
+    ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ConnectSocket == INVALID_SOCKET) {
+        wprintf(L"socket function failed with error: %d\n", WSAGetLastError());
+        WSACleanup();
+        return 1;
+    }
+
+    // The sockaddr_in structure specifies the address family,
+    // IP address, and port of the server to be connected to.
+    struct sockaddr_in clientService;
+    clientService.sin_family = AF_INET;
+    clientService.sin_addr.s_addr = inet_addr("67.191.14.203");//where it's connecting
+    clientService.sin_port = htons(27015);//port
+
+    // Connect to server.
+    buffer = connect(ConnectSocket, (SOCKADDR *) & clientService, sizeof (clientService));
+    if (buffer == SOCKET_ERROR) {
+        wprintf(L"connect function failed with error: %ld\n", WSAGetLastError());
+        buffer = closesocket(ConnectSocket);
+        if (buffer == SOCKET_ERROR)
+            wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
+        WSACleanup();
+        return 1;
+    }
+
+    //setting up timeout prevention
+    unsigned threadID;
+    (HANDLE)_beginthreadex(NULL, 0, &ClientSession, (void*)ConnectSocket, 0, &threadID);
+
+    //login shit
+    bool logger=false;
+    char accounter[1];
+    char login[2][20];
+    while (!logger){
+        printf("do you have an account? Enter Y for yes, or N for no\n");
+        scanf("%s",&accounter[0]);
+        fflush(stdin);//I was told to do this by stack overflow to prevent gets() getting skipped
+        send( ConnectSocket, accounter, 1, 0 );//sending if user wants to make new account
+        if (accounter[0]=='N'){
+            bool newUsername=false;
+            printf("create an account\n");
+            while (true){
+                printf("enter your username\n");
+                memset(login[0], 0, sizeof(login[0]));//resetting the login info
+                gets(login[0]);
+                send( ConnectSocket, login[0], sizeof(login[0]), 0 );//sending login info
+                char checker[100];
+                recv(ConnectSocket, checker, 100, 0);
+                if (strcmp(checker,"okie-dokie")==0){
+                    break;
+                }
+                else printf("username taken, please pick a new one\n");
+            }
+            printf("enter your password\n");
+            gets(login[1]);
+            send( ConnectSocket, login[1], sizeof(login[1]), 0 );//sending login info
+            memset(login[0], 0, sizeof(login[0]));//resetting the login info
+            memset(login[1], 0, sizeof(login[1]));//resetting the login info
+        }
+        if (accounter[0]=='Y'){
+            printf("enter your username\n");
+            gets(login[0]);
+            send( ConnectSocket, login[0], sizeof(login[0]), 0 );//sending login info
+            printf("enter your password\n");
+            gets(login[1]);
+            send( ConnectSocket, login[1], sizeof(login[1]), 0 );//sending login info
+            recv(ConnectSocket, accounter, 1, 0);
+            //printf("%s\n",accounter);
+            if (strcmp("Y",accounter)==0){
+                printf("You're logged in!\n");
+                logger=true;
+            } else {
+                printf("Wrong login\n");
+            }
+            memset(login[0], 0, sizeof(login[0]));//resetting the login info
+            memset(login[1], 0, sizeof(login[1]));//resetting the login info
+        }
+    }
+
+    fflush(stdin);//I was told to do this by stack overflow to prevent gets() getting skipped
+
+    //message listening
+    unsigned listener;
+    (HANDLE)_beginthreadex(NULL, 0, &messageListener, (void*)ConnectSocket, 0, &listener);
+
+    // Receive until the peer closes the connection
+    do {
+        printf("What is the message you want to send?\n");//asking for new message
+        gets(message);//gets message
+
+        // Sending a message
+        buffer = send( ConnectSocket, message, (int)strlen(message), 0 );
+        if (buffer == SOCKET_ERROR) {
+            printf("send failed with error: %d\n", WSAGetLastError());
+            closesocket(ConnectSocket);
+            WSACleanup();
+            return 1;
+        }
+        char receiver[40];
+        printf("Who do you want to send the message to?\n");//asking for who they want to send it to
+        gets(receiver);//gets message
+        // Sending a message
+        buffer = send( ConnectSocket, receiver, (int)strlen(receiver), 0 );
+        //buffer = recv(ConnectSocket, receive, DEFAULT_BUFLEN, 0);
+
+    } while( buffer > 0 );
+
+    // cleanup
+    shutdown(ConnectSocket, SD_SEND);
+    closesocket(ConnectSocket);
+    WSACleanup();    
+    return 0;
+}
+    </pre>
+    <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p class="blurbs">This is a messaging app written in pure C using the winsock library. It has a login system that allows users to sign in with a username of their choice (provided that username isn't taken) and password. It also has an address system that determines which users are signed in. The app works by a user sending a message, indicating who they want to send the message to, and the server sends that message to the person addressed, provided they are online and signed in. A very simple but effective chat app, similar to the chat apps of the early 90s (yes I copy pasted the description from the server above but that's because it's the client side, so together they work towards  that functionality)</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<h2 class="labeler">snake in c++</h2>
+<br>
+<br>
+<pre class="scroll">
+#include &ltiostream>
+#include &ltstring>
+#include &lttime.h>
+#include &ltWindows.h>
+#include &ltstdlib.h>
+#include &ltvector>
+#include &ltalgorithm>
+std::string grid="";
+int fruitMaker(){
+    int r = rand()%784;
+    if (grid[r]==' '){
+        return r;
+    } else {
+        return fruitMaker();
+    }
+}
+void gridPrinter(){
+    for (int c=0;c&ltgrid.length();c++){
+        if (c%28==0){
+            std::cout&lt&ltstd::endl;
+        }
+        std::cout&lt&ltgrid[c];
+    }
+}
+int main(){
+    srand(time(NULL));   // Initialization, should only be called once.
+    std::vector&ltint> subs;
+    int x=300,direction=0,buffer=0,score=0,indexer=0;
+    for (int i=1;i<28*28 +1;i++){
+        if (i%28==0||i%28==1||i/28<1||i+28>=28*28){
+            grid+="#";
+        }else {
+            if (i==x){
+                grid+="0";
+            } else {
+                grid+=" ";
+            }
+        }
+    }
+    x--;
+    bool gameTrue=true;
+    int buffer2=0;
+    grid[fruitMaker()]='*';
+    while (gameTrue){
+       system("CLS");
+       subs.resize(indexer);
+       if(direction!=1&&GetKeyState('A') &0x8000){
+            direction=-1;
+        } else if (direction!=-1&&GetKeyState('D') &0x8000){
+            direction=1;
+        } else if (direction!=28&&GetKeyState('W') &0x8000){
+            direction=-28;
+        } else if (direction!=-28&&GetKeyState('S') &0x8000){
+            direction=28;
+        }
+       buffer=grid[x+direction];
+       if (indexer<1){
+            grid[x+direction]=grid[x];
+       }
+       if (direction!=0){
+            grid[x]=' ';
+       }
+       x+=direction;
+       subs.insert(subs.begin(),x);
+       if (direction!=0&&buffer=='#'){
+            gameTrue=false;
+       } else if (buffer=='*'){
+           score++;
+           indexer++;
+           subs.resize(indexer);
+           if (indexer==1){
+                subs[indexer]=x-direction;
+           } else {
+                indexer++;
+                subs[indexer]=subs[indexer-1]-(subs[indexer-2]-subs[indexer-1]);
+           }
+           grid[fruitMaker()]='*';
+       }
+       std::cout&lt&lt"Your score is: "&lt&ltscore;
+       if (indexer>=1){
+            for (int j=0;j&ltsubs.size();++j){
+                grid[subs[j]]='0';
+                if (j==1){
+                    buffer2=subs[j];
+                    subs[j]=subs[j-1];
+                } else if (j>=1){
+                    int temp=subs[j];
+                    subs[j]=buffer2;
+                    buffer2=temp;
+                    if (subs[j]==subs[0]){
+                        gameTrue=false;
+                    }
+                }
+            }
+       }
+       grid[0]='#';
+       gridPrinter();
+       if (indexer>=1){
+            std::replace( grid.begin(), grid.end(), '0', ' ');
+       }
+    }
+    return 0;
+}
+
+    </pre>
+    <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p class="blurbs">This is snake, written in C++, I have other C/C++ test files and projects, but for now, this is what I'm gonna put up and I'll modify this page later. It's what it sounds like, snake, in C++ console. Just boot up codeblocks and run it and you'll get to play good ol' classic snake</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<h2 class="labeler">discord  bot</h2>
+<br>
+<br>
+<pre class="scroll">
+import os,discord,youtube_dl,asyncio
+from dotenv import load_dotenv
+from discord.ext import commands,tasks 
+from discord.voice_client import VoiceClient
+load_dotenv()
+
+TOKEN = os.getenv('TOKEN')
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix='-',intents=intents)
+
+
+#bot variables
+ben=[True]
+songQueue=[]
+pastSongs=[]
+vc=[""]
+
+
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} has connected to Discord!')
+
+#my pain
+
+youtube_dl.utils.bug_reports_message = lambda: ''
+
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+        self.data = data
+        self.title = data.get('title')
+        self.url = ""
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+        filename = data['title'] if stream else ytdl.prepare_filename(data)
+        return filename
+@bot.event
+async def on_message(message):
+    await bot.process_commands(message)
+    channel=message.channel
+    print(channel)
+    print(message.content)
+    try:
+        if len(pastSongs)>0 and pastSongs[0][1]:
+            os.remove(pastSongs[0][0])
+            pastSongs.pop()
+    except:
+        print("kys loser")
+    if message.author == bot.user:
+        return
+
+    if message.content.lower() == 'kys':
+        response = "https://tenor.com/view/ltg-low-tier-god-yskysn-ltg-thunder-thunder-gif-23523876"
+        await message.channel.send(response)
+    elif message.content.lower() == 'ben' and ben[0]==True:
+        response = "https://tenor.com/view/talking-ben-says-saying-no-outfit7-gif-24967985"
+        await message.channel.send(response)
+    elif message.content.lower() == 'yipee':
+        response = "https://tenor.com/view/yippee-happy-celebration-joy-confetti-gif-25557730"
+        await message.channel.send(response)
+    elif message.content.lower() == 'marie dog':
+        response = "<:whomthefuck:947335702100734013>"
+        await message.channel.send(response)
+    else:
+        return
+        
+@bot.command(name='join')
+async def join(ctx):
+    print("you're bad")
+    if ctx.message.author.voice.channel is None:
+        await ctx.send("{} is not connected to a voice channel".format(ctx.message.author.name))
+        return
+    else:
+        channel = ctx.message.author.voice.channel
+        ctx.send("I have joinedeth")
+    await channel.connect()
+
+@bot.command(name='leave')
+async def leave(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_connected():
+        await voice_client.disconnect()
+        await ctx.send("I have left")
+    else:
+        await ctx.send("The bot is not connected to a voice channel.")
+@bot.command(name='playSong', help='To play song')
+async def play(ctx,url):
+    try:
+        server = ctx.message.guild
+        voice_channel = server.voice_client
+        filename = await YTDLSource.from_url(url, loop=bot.loop)
+        print(filename)
+        voice_client = ctx.message.guild.voice_client
+        voice_channel.play(discord.FFmpegPCMAudio(executable="ffmpeg.exe", source=filename))
+        await ctx.send('**Now playing:** {}'.format(filename))
+        pastSongs.append([filename,voice_client])
+
+    except:
+        ctx.send("you are bad and stinky")
+
+@bot.command(name='pause', help='This command pauses the song')
+async def pause(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_playing():
+        await voice_client.pause()
+    else:
+        await ctx.send("The bot is not playing anything at the moment.")
+    
+@bot.command(name='resume', help='Resumes the song')
+async def resume(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_paused():
+        await voice_client.resume()
+    else:
+        await ctx.send("The bot was not playing anything before this. Use play_song command")
+
+@bot.command(name='stop', help='Stops the song')
+async def stop(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_playing():
+        await voice_client.stop()
+    else:
+        await ctx.send("The bot is not playing anything at the moment.")
+
+@bot.command(name='yesb', help='Stops the song')
+async def yesb(ctx):
+    ben[0]=True
+
+@bot.command(name='nob', help='Stops the song')
+async def nob(ctx):
+    ben[0]=False
+
+
+
+bot.run(TOKEN)
+    </pre>
+    <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p class="blurbs">This is discord bot, written in python. As of right now, this bot can currently play music, and respond to key messages. 
+    I'll progressively add stuff as time goes by but for now, this is a good start</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<footer><img src="penisforeskinicon.jpg" alt="penisforeskin" id="bestimage" style='animation-name:anime; animation-duration: 1s;animation-iteration-count: infinite;
+	'onclick="new Audio('killyourself.mp3').play()"></footer>
+<style>
+      pre.scroll {
+      	margin: 0 auto 0 auto;
+        background-color: #fed9ff;
+        width: 1300px;
+        height: 300px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    </style>
+</body>
+</html>
