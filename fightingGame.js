@@ -85,7 +85,7 @@ const Dracaena = {
 			}
 		},
 		takeHit:{
-			imageSrc:'dracTake hit.png',
+			imageSrc:'dracTakehit.png',
 			framesMax:3,
 			framesHold:11,
 			scale:.43,
@@ -203,11 +203,11 @@ const Richard = {
 			}
 		},
 		takeHit:{
-			imageSrc:'richardTake hit.png',
+			imageSrc:'richardTakehit.png',
 			framesMax:5,
 			framesHold:4,
 			scale:.8,
-			backwardsImg:'richardTake hitbackwards.png',
+			backwardsImg:'richardTakehitbackwards.png',
 			temp:null,
 			offset:{
 				x:70,
