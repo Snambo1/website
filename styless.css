@@ -1,7 +1,7 @@
 #title {
 	font-size: 20px;
 	text-align: center;
-	font-family: mgs;
+	font-family: botw;
 }
 body {
 	margin: 0;
@@ -9,7 +9,6 @@ body {
 }
 
 h2 {
-	margin-left: 2%;
 	font-family: botw;
 	font-size: 30px;
 }
