@@ -89,7 +89,7 @@ const Dracaena = {
 			framesMax:3,
 			framesHold:11,
 			scale:.43,
-			backwardsImg:'dracTakeHitbackwards.png',
+			backwardsImg:'dracTakehitbackwards.png',
 			temp:null,
 			offset:{
 				x:60,
