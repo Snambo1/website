@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html> <link rel="stylesheet" href="styless.css"> <link rel="icon" href="penisforeskinicon.jpg"> 
-<title>Penisfore.skin</title>
+<title>Port Headband</title>
 <head>
 <div class="topnav">
 	<img src="penisforeskinicon.jpg" alt="penisforeskin" id="bestimage" style='animation-name:anime; animation-duration: 1s;animation-iteration-count: infinite;'onclick="new Audio('killyourself.mp3').play()">
 	<a href="programs.html" class="hoverable active">Programs</a>
 	<a href="reviews.html" class="hoverable">Reviews</a>
     <a href="games.html" class="hoverable">Games</a>
-    <a href="penisforeskin.html" class="hoverable">Home</a>
+    <a href="index.html" class="hoverable">Home</a>
 </div>
-<h1 id="title">PENISFORESKIN.COM</h1>
+<h1 id="title">PORT HEADBAND</h1>
 <hr class="liner">
 <hr class="liner">
 <ul class="other-pages">
@@ -20,332 +20,342 @@
 <br>
 <br>
 <pre class="scroll">
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define DEFAULT_PORT "27015"
-#define DEFAULT_BUFLEN 512
-
-#include &ltwindows.h>
-#include &ltwinsock2.h>
-#include &ltws2tcpip.h>
-#include &ltiphlpapi.h>
-
-#include &ltstdio.h>
-#include &ltstdlib.h>
-#include &ltstring.h>
-#include &ltstdbool.h>
-#include &ltprocess.h>
-
-FILE *users;//user database file for account making and logging in
-FILE *usernames;//list of taken usernames
-
-struct user {
-    SOCKET connection;//socket user is connected to
-    char username[20];//their username
-};
-
-struct user *connecters;//dynamic list of connected users
-int length=0;//length of connected users
-
-struct user* remove_element(struct user* array, int sizeOfArray, int indexToRemove){
-    struct user* temp = malloc((sizeOfArray - 1) * sizeof(struct user)); // allocate an array with a size 1 less than the current one
-
-    if (indexToRemove != 0)
-        memcpy(temp, array, indexToRemove * sizeof(struct user)); // copy everything BEFORE the index
-
-    if (indexToRemove != (sizeOfArray - 1))
-        memcpy(temp+indexToRemove, array+indexToRemove+1, (sizeOfArray - indexToRemove - 1) * sizeof(struct user)); // copy everything AFTER the index
-
-    free (array);
-    return temp;
-}
-
-unsigned __stdcall ClientSession(void *data){//multithreading, gonna  be real  with you I have no idea how this code works
-    SOCKET ClientSocket = (SOCKET)data;// Process the client.
-
-    //message receiving setup stuff
-    char message[DEFAULT_BUFLEN];
-    int buffer;//function recorder
-    int buffer2;//another function  recorder
-    int iSendResult;
-    int messageSize = DEFAULT_BUFLEN;
-    char sender[100];//user that  is sending stuff
-
-    //login shit
-    bool logger=false;
-    char accounter[1];//records if  they have an account
-
-    while (!logger){
-
-        buffer2=recv(ClientSocket, accounter, 1, 0);//checking if they need to make a new account or can log in
-        if (!(buffer2>=0)){
-            printf("recv failed: %d\n", WSAGetLastError());
-            closesocket(ClientSocket);
-            return 1;
-        }
-
-        if (accounter[0]=='N'){
-            users=fopen("users.txt","a");//opens the user recording file
-            char holder[2][20];//holds the login info
-            while (true){
-                usernames=fopen("usernames.txt","r");//opens the username list file
-                bool taken=false;
-                buffer2=recv(ClientSocket, holder[0], 20, 0);//getting the username
-                if (!(buffer2>=0)){
-                    printf("recv failed: %d\n", WSAGetLastError());
-                    closesocket(ClientSocket);
-                    return 1;
+    #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+    #endif
+    
+    #define DEFAULT_PORT "27015"
+    #define DEFAULT_BUFLEN 512
+    
+    #include &ltwindows.h>
+    #include &ltwinsock2.h>
+    #include &ltws2tcpip.h>
+    #include &ltiphlpapi.h>
+    
+    #include &ltstdio.h>
+    #include &ltstdlib.h>
+    #include &ltstring.h>
+    #include &ltstdbool.h>
+    #include &ltprocess.h>
+    
+    FILE *users;//user database file for account making and logging in
+    FILE *usernames;//list of taken usernames
+    
+    struct user {
+        SOCKET connection;//socket user is connected to
+        char username[20];//their username
+    };
+    
+    struct user *connecters;//dynamic list of connected users
+    int length=0;//length of connected users
+    
+    struct user* remove_element(struct user* array, int sizeOfArray, int indexToRemove){
+        struct user* temp = malloc((sizeOfArray - 1) * sizeof(struct user)); // allocate an array with a size 1 less than the current one
+    
+        if (indexToRemove != 0)
+            memcpy(temp, array, indexToRemove * sizeof(struct user)); // copy everything BEFORE the index
+    
+        if (indexToRemove != (sizeOfArray - 1))
+            memcpy(temp+indexToRemove, array+indexToRemove+1, (sizeOfArray - indexToRemove - 1) * sizeof(struct user)); // copy everything AFTER the index
+    
+        free (array);
+        return temp;
+    }
+    
+    unsigned __stdcall ClientSession(void *data){//multithreading, gonna  be real  with you I have no idea how this code works
+        SOCKET ClientSocket = (SOCKET)data;// Process the client.
+    
+        //message receiving setup stuff
+        char message[DEFAULT_BUFLEN];
+        int buffer;//function recorder
+        int buffer2;//another function  recorder
+        int iSendResult;
+        int messageSize = DEFAULT_BUFLEN;
+        char sender[100];//user that  is sending stuff
+    
+        //login shit
+        bool logger=false;
+        char accounter[1];//records if  they have an account
+    
+        do {//it has to be a do while so the thread ends properly
+            buffer2=recv(ClientSocket, accounter, 1, 0);//checking if they need to make a new account or can log in
+            printf("%d\n",buffer2);
+            if (!(buffer2>=0)){
+                printf("recv failed: %d\n", WSAGetLastError());
+                closesocket(ClientSocket);
+                return 1;
+            }
+    
+            if (accounter[0]=='N'){
+                users=fopen("users.txt","a");//opens the user recording file
+                char holder[2][20];//holds the login info
+                while (true){
+                    usernames=fopen("usernames.txt","r");//opens the username list file
+                    bool taken=false;
+                    buffer2=recv(ClientSocket, holder[0], 20, 0);//getting the username
+                    if (!(buffer2>=0)){
+                        printf("recv failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+    
+                    if (strcmp(holder[0]," ")==0){//checks if it's just a timeout space
+                        memset(holder[0], 0, sizeof(holder[0]));//resetting login info if it's just a space
+                        continue;
+                    }
+    
+                    //checks if the username is taken
+                    char checker[100];
+                    while(fgets(checker, 100, usernames)) {
+                        if (checker[strlen(checker)-1]== '\n') checker[strlen(checker)-1]='\0';
+                        if (strcmp(checker,holder[0])==0){
+                            taken=true;
+                            char denier[]="taken";
+                            send(ClientSocket, denier, (int)strlen(denier), 0);
+                            break;
+                        }
+                    }
+                    fclose(usernames);
+                    if (taken) continue;
+                    char accepter[]="okie-dokie";
+                    send(ClientSocket, accepter, (int)strlen(accepter), 0);
+                    break;
                 }
-
-                if (strcmp(holder[0]," ")==0){//checks if it's just a timeout space
-                    memset(holder[0], 0, sizeof(holder[0]));//resetting login info if it's just a space
-                    continue;
+    
+                while (true){
+                    buffer2=recv(ClientSocket, holder[1], 20, 0);//getting the login info
+                    if (!(buffer2>=0)){
+                        printf("recv failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+    
+                    if (strcmp(holder[1]," ")==0){
+                        memset(holder[1], 0, sizeof(holder[1]));//resetting login info if it's just a space
+                        continue;
+                    }
+                    break;
                 }
-
-                //checks if the username is taken
-                char checker[100];
-                while(fgets(checker, 100, usernames)) {
-                    if (checker[strlen(checker)-1]== '\n') checker[strlen(checker)-1]='\0';
-                    if (strcmp(checker,holder[0])==0){
-                        taken=true;
-                        char denier[]="taken";
-                        send(ClientSocket, denier, (int)strlen(denier), 0);
+                //recording the new account
+                char account[] = " username: ";
+                strcat(account,holder[0]);
+                strcat(account," password: ");
+                strcat(account,holder[1]);
+                strcat(account,"\n");
+                fprintf(users,account);//recording  login info
+                strcat(holder[0],"\n");
+                usernames=fopen("usernames.txt","a");
+                fprintf(usernames,holder[0]);//recording the username
+                fclose(users);
+                fclose(usernames);
+            }
+    
+            if (accounter[0]=='Y'){
+                char holder[2][20];//stores login info
+                while (true){
+                    buffer2=recv(ClientSocket, holder[0], 20, 0);//getting the login info
+                    if (!(buffer2>=0)){
+                        printf("recv failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+    
+                    if (strcmp(holder[0]," ")==0){
+                        memset(holder[0], 0, sizeof(holder[0]));//resetting login info if it's just a space
+                        continue;
+                    }
+                    break;
+                }
+                while (true){
+                    buffer2=recv(ClientSocket, holder[1], 20, 0);//getting the login info
+                    if (!(buffer2>=0)){
+                        printf("recv failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+    
+                    if (strcmp(holder[1]," ")==0){
+                        memset(holder[1], 0, sizeof(holder[1]));//resetting login info if it's just a space
+                        continue;
+                    }
+                    break;
+                }
+    
+                char account[] = " username: ";
+                strcat(account,holder[0]);
+                strcat(account," password: ");
+                strcat(account,holder[1]);
+                printf("%s\n",account);
+    
+                char accountBuffer[100];
+                bool noper=false;
+                users=fopen("users.txt","r");
+                while (fgets(accountBuffer, 100, users)){
+                    if (accountBuffer[strlen(accountBuffer)-1]== '\n') accountBuffer[strlen(accountBuffer)-1]='\0';//checks if last character is newline
+                    if (strcmp(account,accountBuffer)==0){
+                        //login confirmation stuff
+                        logger=true;
+                        send(ClientSocket, "Y", 1, 0);//yes they logged in right
+                        printf("Logged in\n");
+                        length++;
+                        connecters=realloc(connecters,length*sizeof(struct user));
+                        struct user newGuy = {
+                            .connection=ClientSocket
+                        };
+                        memcpy(newGuy.username, holder[0], 20);
+                        connecters[length-1]=newGuy;
+                        fclose(users);
+                        strcpy(sender,holder[0]);
+                        noper=true;
                         break;
                     }
                 }
-                fclose(usernames);
-                if (taken) continue;
-                char accepter[]="okie-dokie";
-                send(ClientSocket, accepter, (int)strlen(accepter), 0);
-                break;
+    
+                if (!noper) send(ClientSocket, "N", 1, 0);//no they logged in wrong
+                memset(holder[0], 0, sizeof(holder[0]));//resetting the login info
+                memset(holder[1], 0, sizeof(holder[1]));//resetting the login info
             }
-
-            while (true){
-                buffer2=recv(ClientSocket, holder[1], 20, 0);//getting the login info
-                if (!(buffer2>=0)){
-                    printf("recv failed: %d\n", WSAGetLastError());
-                    closesocket(ClientSocket);
-                    return 1;
-                }
-
-                if (strcmp(holder[1]," ")==0){
-                    memset(holder[1], 0, sizeof(holder[1]));//resetting login info if it's just a space
-                    continue;
-                }
-                break;
-            }
-            //recording the new account
-            char account[] = " username: ";
-            strcat(account,holder[0]);
-            strcat(account," password: ");
-            strcat(account,holder[1]);
-            strcat(account,"\n");
-            fprintf(users,account);//recording  login info
-            strcat(holder[0],"\n");
-            usernames=fopen("usernames.txt","a");
-            fprintf(usernames,holder[0]);//recording the username
-            fclose(users);
-            fclose(usernames);
-        }
-
-        if (accounter[0]=='Y'){
-            char holder[2][20];//stores login info
-            while (true){
-                buffer2=recv(ClientSocket, holder[0], 20, 0);//getting the login info
-                if (!(buffer2>=0)){
-                    printf("recv failed: %d\n", WSAGetLastError());
-                    closesocket(ClientSocket);
-                    return 1;
-                }
-
-                if (strcmp(holder[0]," ")==0){
-                    memset(holder[0], 0, sizeof(holder[0]));//resetting login info if it's just a space
-                    continue;
-                }
-                break;
-            }
-            while (true){
-                buffer2=recv(ClientSocket, holder[1], 20, 0);//getting the login info
-                if (!(buffer2>=0)){
-                    printf("recv failed: %d\n", WSAGetLastError());
-                    closesocket(ClientSocket);
-                    return 1;
-                }
-
-                if (strcmp(holder[1]," ")==0){
-                    memset(holder[1], 0, sizeof(holder[1]));//resetting login info if it's just a space
-                    continue;
-                }
-                break;
-            }
-
-            char account[] = " username: ";
-            strcat(account,holder[0]);
-            strcat(account," password: ");
-            strcat(account,holder[1]);
-            printf("%s\n",account);
-
-            char accountBuffer[100];
-            bool noper=false;
-            users=fopen("users.txt","r");
-            while (fgets(accountBuffer, 100, users)){
-                if (accountBuffer[strlen(accountBuffer)-1]== '\n') accountBuffer[strlen(accountBuffer)-1]='\0';//checks if last character is newline
-                if (strcmp(account,accountBuffer)==0){
-                    //login confirmation stuff
-                    logger=true;
-                    send(ClientSocket, "Y", 1, 0);//yes they logged in right
-                    printf("Logged in\n");
-                    length++;
-                    connecters=realloc(connecters,length*sizeof(struct user));
-                    struct user newGuy = {
-                        .connection=ClientSocket
-                    };
-                    memcpy(newGuy.username, holder[0], 20);
-                    connecters[length-1]=newGuy;
-                    fclose(users);
-                    strcpy(sender,holder[0]);
-                    noper=true;
+        } while (!logger&&buffer2>0);//making it so the thread ends properly if connection is insantly abandoned
+    
+        // Receive until the peer shuts down the connection
+        do {
+            memset(message, 0, sizeof(message));//resetting the message
+            buffer = recv(ClientSocket, message, messageSize, 0);//receiving  the message
+            if (buffer > 0) {
+                if (strcmp(message," ")==0) continue;
+                printf("%s\n",message);//prints message they sent
+                char receiver[50];
+                memset(receiver, 0, sizeof(receiver));//resetting this because for some reason it doesn't work when I don't
+                while (true){
+                    buffer2=recv(ClientSocket, receiver, 20, 0);//receiving  the receiver
+                    if (!(buffer2>=0)){
+                        printf("recv failed: %d\n", WSAGetLastError());
+                        closesocket(ClientSocket);
+                        return 1;
+                    }
+                    if (strcmp(receiver," ")==0){
+                        memset(receiver, 0, sizeof(receiver));//resetting the receiver if it's just a space
+                        continue;
+                    }
                     break;
                 }
+                //searches for user to send the message to
+                for (int i=0;i&ltlength;i++){
+                    if (strcmp(connecters[i].username,receiver)==0){
+                        iSendResult = send(connecters[i].connection, sender, sizeof(sender), 0);
+                        if (iSendResult == SOCKET_ERROR) {
+                            printf("send failed: %d\n", WSAGetLastError());
+                            closesocket(ClientSocket);
+                            return 1;
+                        }
+                        //send  message to correct person
+                        iSendResult = send(connecters[i].connection, message, sizeof(message), 0);
+                        if (iSendResult == SOCKET_ERROR) {
+                            printf("send failed: %d\n", WSAGetLastError());
+                            closesocket(ClientSocket);
+                            return 1;
+                        }
+                    }
+                }
+            } else if (buffer == 0)
+                printf("Connection closing...\n");
+            else {
+                printf("recv failed: %d\n", WSAGetLastError());
+                for (int i=0;i&ltlength;i++){
+                    if (connecters[i].connection==ClientSocket&&strcmp(connecters[i].username,sender)==0){
+                        connecters = remove_element(connecters, length, i);
+                        length--;
+                    }
+                }
+                closesocket(ClientSocket);
+                return 1;
             }
-
-            if (!noper) send(ClientSocket, "N", 1, 0);//no they logged in wrong
-            memset(holder[0], 0, sizeof(holder[0]));//resetting the login info
-            memset(holder[1], 0, sizeof(holder[1]));//resetting the login info
+    
+        } while (buffer > 0);
+    
+        //removing them from the list
+        for (int i=0;i&ltlength;i++){
+            if (connecters[i].connection==ClientSocket&&strcmp(connecters[i].username,sender)==0){
+                connecters = remove_element(connecters, length, i);
+                length--;
+            }
         }
+        closesocket(ClientSocket);
+        printf("thread ended\n");
+        return 0;
     }
-
-    // Receive until the peer shuts down the connection
-    do {
-        memset(message, 0, sizeof(message));//resetting the message
-        buffer = recv(ClientSocket, message, messageSize, 0);//receiving  the message
-        if (buffer > 0) {
-            if (strcmp(message," ")==0) continue;
-            printf("%s\n",message);//prints message they sent
-            char receiver[50];
-            memset(receiver, 0, sizeof(receiver));//resetting this because for some reason it doesn't work when I don't
-            while (true){
-                buffer2=recv(ClientSocket, receiver, 20, 0);//receiving  the receiver
-                if (!(buffer2>=0)){
-                    printf("recv failed: %d\n", WSAGetLastError());
-                    closesocket(ClientSocket);
-                    return 1;
-                }
-                if (strcmp(receiver," ")==0){
-                    memset(receiver, 0, sizeof(receiver));//resetting the receiver if it's just a space
-                    continue;
-                }
-                break;
-            }
-            //searches for user to send the message to
-            for (int i=0;i&ltlength;i++){
-                if (strcmp(connecters[i].username,receiver)==0){
-                    iSendResult = send(connecters[i].connection, sender, sizeof(sender), 0);
-                    if (iSendResult == SOCKET_ERROR) {
-                        printf("send failed: %d\n", WSAGetLastError());
-                        closesocket(ClientSocket);
-                        return 1;
-                    }
-                    //send  message to correct person
-                    iSendResult = send(connecters[i].connection, message, sizeof(message), 0);
-                    if (iSendResult == SOCKET_ERROR) {
-                        printf("send failed: %d\n", WSAGetLastError());
-                        closesocket(ClientSocket);
-                        return 1;
-                    }
-                }
-            }
-        } else if (buffer == 0)
-            printf("Connection closing...\n");
-        else {
-            printf("recv failed: %d\n", WSAGetLastError());
-            for (int i=0;i&ltlength;i++){
-                if (connecters[i].connection==ClientSocket){
-                    connecters = remove_element(connecters, length, i);
-                    length--;
-                }
-            }
-            closesocket(ClientSocket);
+    
+    int main(){
+        connecters=(struct user*)malloc(length * sizeof(struct user));//list of connected users
+    
+        //winsock setup variables
+        WSADATA wsaData;
+        int buffer;
+        struct sockaddr_in service;//struct that stores ip address
+    
+        // Initialize Winsock
+        buffer = WSAStartup(MAKEWORD(2,2), &wsaData);
+        if (buffer != 0) {
+            printf("WSAStartup failed: %d\n", buffer);
             return 1;
         }
-
-    } while (buffer > 0);
-    printf("thread ended\n");
-    return 0;
-}
-
-int main(){
-    connecters=(struct user*)malloc(length * sizeof(struct user));//list of connected users
-
-    //winsock setup variables
-    WSADATA wsaData;
-    int buffer;
-    struct sockaddr_in service;//struct that stores ip address
-
-    // Initialize Winsock
-    buffer = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (buffer != 0) {
-        printf("WSAStartup failed: %d\n", buffer);
-        return 1;
-    }
-
-    // Create a SOCKET for listening for
-    // incoming connection requests
-    SOCKET ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (ListenSocket == INVALID_SOCKET) {
-        wprintf(L"socket function failed with error: %u\n", WSAGetLastError());
-        WSACleanup();
-        return 1;
-    }
-
-    // The sockaddr_in structure specifies the address family,
-    // IP address, and port for the socket that is being bound.
-    service.sin_family = AF_INET;
-    service.sin_addr.s_addr = inet_addr("192.168.1.21");//ip to bind to
-    service.sin_port = htons(27015);//port
-
-
-    // Bind the socket.
-    buffer = bind(ListenSocket, (SOCKADDR *) &service, sizeof (service));
-    if (buffer == SOCKET_ERROR) {
-        wprintf(L"bind failed with error %u\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    //listening for incoming socket
-    while (true){
-        if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
-            printf( "Listen failed with error: %d\n", WSAGetLastError() );
+    
+        // Create a SOCKET for listening for
+        // incoming connection requests
+        SOCKET ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (ListenSocket == INVALID_SOCKET) {
+            wprintf(L"socket function failed with error: %u\n", WSAGetLastError());
+            WSACleanup();
+            return 1;
+        }
+    
+        // The sockaddr_in structure specifies the address family,
+        // IP address, and port for the socket that is being bound.
+        service.sin_family = AF_INET;
+        service.sin_addr.s_addr = inet_addr("172.16.226.210");//ip to bind to
+        service.sin_port = htons(27015);//port
+    
+    
+        // Bind the socket.
+        buffer = bind(ListenSocket, (SOCKADDR *) &service, sizeof (service));
+        if (buffer == SOCKET_ERROR) {
+            wprintf(L"bind failed with error %u\n", WSAGetLastError());
             closesocket(ListenSocket);
             WSACleanup();
             return 1;
         }
-        SOCKET ClientSocket;
-        ClientSocket = INVALID_SOCKET;
-
-        // Accept a client socket
-        ClientSocket = accept(ListenSocket, NULL, NULL);
-        printf("%llu\n",ClientSocket);//printing the client socket
-        if (ClientSocket == INVALID_SOCKET) {
-            printf("accept failed: %d\n", WSAGetLastError());
-            closesocket(ListenSocket);
-            WSACleanup();
-            return 1;
+    
+        //listening for incoming socket
+        while (true){
+            if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
+                printf( "Listen failed with error: %d\n", WSAGetLastError() );
+                closesocket(ListenSocket);
+                WSACleanup();
+                return 1;
+            }
+            SOCKET ClientSocket;
+            ClientSocket = INVALID_SOCKET;
+    
+            // Accept a client socket
+            ClientSocket = accept(ListenSocket, NULL, NULL);
+            printf("%llu\n",ClientSocket);//printing the client socket
+            if (ClientSocket == INVALID_SOCKET) {
+                printf("accept failed: %d\n", WSAGetLastError());
+                closesocket(ListenSocket);
+                WSACleanup();
+                return 1;
+            }
+            // Create a new thread for the accepted client (also pass the accepted client socket).
+            unsigned threadID;
+            (HANDLE)_beginthreadex(NULL, 0, &ClientSession, (void*)ClientSocket, 0, &threadID);
         }
-        // Create a new thread for the accepted client (also pass the accepted client socket).
-        unsigned threadID;
-        (HANDLE)_beginthreadex(NULL, 0, &ClientSession, (void*)ClientSocket, 0, &threadID);
+    
+        // cleanup
+        WSACleanup();
+        printf("socket adventures");
+        return 0;
     }
-
-    // cleanup
-    WSACleanup();
-    printf("socket adventures");
-    return 0;
-}
+    
 
 
     </pre>
@@ -356,7 +366,13 @@ int main(){
 <br>
 <br>
 <br>
-<p class="blurbs">This is server for a messaging app written in pure C using the winsock library. It has a login system that allows users to sign in with a username of their choice (provided that username isn't taken) and password. It also has an address system that determines which users are signed in. The app works by a user sending a message, indicating who they want to send the message to, and the server sends that message to the person addressed, provided they are online and signed in. A very simple but effective chat app, similar to the chat apps of the early 90s</p>
+<p class="blurbs">This is server for a messaging app written in pure C using the winsock library. It has a login system that allows users to sign in with a username of their 
+    choice (provided that username isn't taken) and password. It also has an address system that determines which users are signed in. The app works by a user sending a message, 
+    indicating who they want to send the message to, and the server sends that message to the person addressed, provided they are online and signed in. A very simple but effective 
+    chat app, similar to the chat apps of the early 90s. The server runs based off a custom database design and remembers login infos long after the client signs off,
+    or the server goes down. A lot of this was difficult to design as I had to work with both the client and server side of things simultaneously. I always find myself coming back
+    to this project to add more features and whatnot.   
+</p>
 <br>
 <br>
 <br>
@@ -366,320 +382,564 @@ int main(){
 <br>
 <br>
 <pre class="scroll">
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
-
-#include &ltstdio.h>
-#include &ltstdlib.h>
-#include &ltstdbool.h>
-#include &ltstring.h>
-#include &lttime.h>
-#include &ltprocess.h>
-
-#include &ltwindows.h>
-#include &ltwinsock2.h>
-#include &ltws2tcpip.h>
-#include &ltiphlpapi.h>
-
-
-void delay(int number_of_seconds){
-    int milli_seconds = 1000 * number_of_seconds;// Converting time into milli_seconds
-    clock_t start_time = clock();// Storing start time
-    while (clock() < start_time + milli_seconds);// looping till required time is not achieved
-}
-
-unsigned __stdcall ClientSession(void *data){//multithreading to stop timeout bug
-    SOCKET ConnectSocket = (SOCKET)data;// Process the client.
-    char message[]=" ";//blank message to send server
-    int buffer;
-    while (true){
-        delay(240);//delay of 4 minutes
-        buffer = send( ConnectSocket, message, (int)strlen(message), 0 );//sending server a blank message to keep connection going
-        if (buffer == SOCKET_ERROR) {
-            printf("send failed with error: %d\n", WSAGetLastError());
-            closesocket(ConnectSocket);
+    #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+    #endif
+    
+    #define DEFAULT_BUFLEN 512
+    #define DEFAULT_PORT "27015"
+    
+    #include &ltstdio.h>
+    #include &ltstdlib.h>
+    #include &ltstdbool.h>
+    #include &ltstring.h>
+    #include &lttime.h>
+    #include &ltprocess.h>
+    #include &ltmath.h>
+    #include &ltSDL2/SDL.h>
+    #include &ltSDL2/SDL_image.h>
+    #include &ltSDL2/SDL_ttf.h>
+    
+    #include &ltwindows.h>
+    #include &ltwinsock2.h>
+    #include &ltws2tcpip.h>
+    #include &ltiphlpapi.h>
+    
+    #define PI atan(1)*4
+    
+    char lastMessage[100];
+    
+    //circle maker
+    void drawCircle(SDL_Renderer *renderer, int x, int y, int radius){
+        for (int w = 0; w < radius * 2; w++) {
+            for (int h = 0; h < radius * 2; h++) {
+                int dx = radius - w; // horizontal offset
+                int dy = radius - h; // vertical offset
+                if ((dx*dx + dy*dy) <= (radius * radius)) SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+            }
+        }
+    }
+    void delay(int number_of_seconds){
+        int milli_seconds = 1000 * number_of_seconds;// Converting time into milli_seconds
+        clock_t start_time = clock();// Storing start time
+        while (clock() < start_time + milli_seconds);// looping till required time is not achieved
+    }
+    
+    unsigned __stdcall ClientSession(void *data){//multithreading to stop timeout bug
+        SOCKET ConnectSocket = (SOCKET)data;// Process the client.
+        char message[]=" ";//blank message to send server
+        int buffer;
+        while (true){
+            delay(240);//delay of 4 minutes
+            buffer = send( ConnectSocket, message, (int)strlen(message), 0 );//sending server a blank message to keep connection going
+            if (buffer == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+                closesocket(ConnectSocket);
+                WSACleanup();
+                return 1;
+            }
+        }
+        return 0;
+    }
+    
+    unsigned __stdcall messageListener(void *data){//multithreading to receive messages
+        SOCKET ConnectSocket = (SOCKET)data;// Process the client.
+        char message[DEFAULT_BUFLEN];//message holder
+        char sender[50];
+        int buffer;
+        while (true){
+            recv(ConnectSocket, sender, DEFAULT_BUFLEN, 0);//getting the user
+            recv(ConnectSocket, message, DEFAULT_BUFLEN, 0);//getting the message
+            strcat(sender," : ");
+            strcat(sender,message);
+            memset(lastMessage,0,sizeof(lastMessage));
+            strcpy(lastMessage,sender);
+            memset(message, 0, sizeof(message));//resetting the message
+            memset(sender, 0, sizeof(sender));//resetting the message
+        }
+        return 0;
+    }
+    
+    const int width=1024,height=576;//screen proportions
+    
+    int main(int argc,char **argv){
+        strcpy(lastMessage,"");
+        //SDL setup stuff
+        bool quit = false;
+        SDL_Event event;
+        SDL_Init( SDL_INIT_EVERYTHING );
+        IMG_Init(IMG_INIT_PNG);
+        IMG_Init(IMG_INIT_JPG);
+        TTF_Init();
+    
+        //winsock stuff
+        WSADATA wsaData;
+        SOCKET ConnectSocket = INVALID_SOCKET;// connecting socket
+    
+        char message[DEFAULT_BUFLEN];//message holder
+    
+        char receive[DEFAULT_BUFLEN];//received message storage
+        int buffer;
+    
+        // Initialize Winsock
+        buffer = WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (buffer != NO_ERROR) {
+            wprintf(L"WSAStartup function failed with error: %d\n", buffer);
+            return 1;
+        }
+    
+        // Create a SOCKET for connecting to server
+        ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (ConnectSocket == INVALID_SOCKET) {
+            wprintf(L"socket function failed with error: %d\n", WSAGetLastError());
             WSACleanup();
             return 1;
         }
-    }
-    return 0;
-}
-
-unsigned __stdcall messageListener(void *data){//multithreading to receive messages
-    SOCKET ConnectSocket = (SOCKET)data;// Process the client.
-    char message[DEFAULT_BUFLEN];//message holder
-    char sender[50];
-    int buffer;
-    while (true){
-        recv(ConnectSocket, sender, DEFAULT_BUFLEN, 0);//getting the user
-        recv(ConnectSocket, message, DEFAULT_BUFLEN, 0);//getting the message
-        strcat(sender," : ");
-        strcat(sender,message);
-        printf("%s\n",sender);
-        memset(message, 0, sizeof(message));//resetting the message
-        memset(sender, 0, sizeof(sender));//resetting the message
-    }
-    return 0;
-}
-
-int main(int argc,char **argv){
-    WSADATA wsaData;
-    SOCKET ConnectSocket = INVALID_SOCKET;// connecting socket
-
-    char message[DEFAULT_BUFLEN];//message holder
-
-    char receive[DEFAULT_BUFLEN];//received message storage
-    int buffer;
-
-    // Initialize Winsock
-    buffer = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (buffer != NO_ERROR) {
-        wprintf(L"WSAStartup function failed with error: %d\n", buffer);
-        return 1;
-    }
-
-    // Create a SOCKET for connecting to server
-    ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (ConnectSocket == INVALID_SOCKET) {
-        wprintf(L"socket function failed with error: %d\n", WSAGetLastError());
-        WSACleanup();
-        return 1;
-    }
-
-    // The sockaddr_in structure specifies the address family,
-    // IP address, and port of the server to be connected to.
-    struct sockaddr_in clientService;
-    clientService.sin_family = AF_INET;
-    clientService.sin_addr.s_addr = inet_addr("67.191.14.203");//where it's connecting
-    clientService.sin_port = htons(27015);//port
-
-    // Connect to server.
-    buffer = connect(ConnectSocket, (SOCKADDR *) & clientService, sizeof (clientService));
-    if (buffer == SOCKET_ERROR) {
-        wprintf(L"connect function failed with error: %ld\n", WSAGetLastError());
-        buffer = closesocket(ConnectSocket);
-        if (buffer == SOCKET_ERROR)
-            wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
-        WSACleanup();
-        return 1;
-    }
-
-    //setting up timeout prevention
-    unsigned threadID;
-    (HANDLE)_beginthreadex(NULL, 0, &ClientSession, (void*)ConnectSocket, 0, &threadID);
-
-    //login shit
-    bool logger=false;
-    char accounter[1];
-    char login[2][20];
-    while (!logger){
-        printf("do you have an account? Enter Y for yes, or N for no\n");
-        scanf("%s",&accounter[0]);
-        fflush(stdin);//I was told to do this by stack overflow to prevent gets() getting skipped
-        send( ConnectSocket, accounter, 1, 0 );//sending if user wants to make new account
-        if (accounter[0]=='N'){
-            bool newUsername=false;
-            printf("create an account\n");
-            while (true){
-                printf("enter your username\n");
-                memset(login[0], 0, sizeof(login[0]));//resetting the login info
-                gets(login[0]);
-                send( ConnectSocket, login[0], sizeof(login[0]), 0 );//sending login info
-                char checker[100];
-                recv(ConnectSocket, checker, 100, 0);
-                if (strcmp(checker,"okie-dokie")==0){
+    
+        // The sockaddr_in structure specifies the address family,
+        // IP address, and port of the server to be connected to.
+        struct sockaddr_in clientService;
+        clientService.sin_family = AF_INET;
+        clientService.sin_addr.s_addr = inet_addr("172.16.226.210");//where it's connecting
+        clientService.sin_port = htons(27015);//port
+    
+        // Connect to server.
+        buffer = connect(ConnectSocket, (SOCKADDR *) & clientService, sizeof (clientService));
+        if (buffer == SOCKET_ERROR) {
+            wprintf(L"connect function failed with error: %ld\n", WSAGetLastError());
+            buffer = closesocket(ConnectSocket);
+            if (buffer == SOCKET_ERROR)
+                wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
+            WSACleanup();
+            return 1;
+        }
+    
+        //setting up timeout prevention
+        unsigned threadID;
+        (HANDLE)_beginthreadex(NULL, 0, &ClientSession, (void*)ConnectSocket, 0, &threadID);
+    
+        //end of client setup stuff
+    
+        SDL_Window * window = SDL_CreateWindow("messaging app",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);//creating a window
+        SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);//creating the renderer
+        SDL_Surface * screen=SDL_CreateRGBSurface(0,width,height,32,0,0,0,0);
+        TTF_Font* Sans = TTF_OpenFont("The Wild Breath of Zelda.otf", 24);//setting up the font
+        SDL_Surface * icon=IMG_Load("penisforeskinicon.JPG");//icon
+        SDL_Color black = {0, 0, 0};
+        SDL_SetRenderDrawColor(renderer,20,0,123,0);
+    
+        char input[DEFAULT_BUFLEN];
+        strcpy(input,"");
+        char prompt[100];
+        strcpy(prompt,"do you have an account? Enter Y for yes, or N for no" );
+    
+        char screenType[20];
+        strcpy(screenType,"login");
+    
+        //login variables
+        bool logger=false;
+        char login[2][20];
+        char accounter[1];
+    
+        char text[100];//message
+    
+        //universal screen rects
+        SDL_Rect topbar;
+        topbar.y=0;
+        topbar.x=0;
+        topbar.h=80;
+        topbar.w=width;
+    
+        SDL_Rect titleRect; //create a rect
+        titleRect.w = 100; // controls the width of the rect
+        titleRect.h = 60; // controls the height of the rect
+        titleRect.x = width/2 -titleRect.w/2;  //controls the rect's x coordinate
+        titleRect.y = topbar.y+15; // controls the rect's y coordinte
+    
+        SDL_Rect bottombar;
+        bottombar.y=height-20;
+        bottombar.x=0;
+        bottombar.h=20;
+        bottombar.w=width;
+    
+        SDL_Rect sq1;
+        sq1.w=100;
+        sq1.h=60;
+        sq1.x=topbar.x+20;
+        sq1.y=topbar.y+10;
+    
+        SDL_Rect sq2;
+        sq2.w=100;
+        sq2.h=60;
+        sq2.x=sq1.x+sq1.w+20;
+        sq2.y=topbar.y+10;
+    
+        SDL_Rect sq3;
+        sq3.w=100;
+        sq3.h=60;
+        sq3.x=sq2.x+sq2.w+20;
+        sq3.y=topbar.y+10;
+    
+        SDL_Rect sq4;
+        sq4.w=100;
+        sq4.h=60;
+        sq4.x=topbar.w-sq4.w-20;
+        sq4.y=topbar.y+10;
+    
+        SDL_Rect sq5;
+        sq5.w=100;
+        sq5.h=60;
+        sq5.x=sq4.x-sq5.w-20;
+        sq5.y=topbar.y+10;
+    
+        SDL_Rect sq6;
+        sq6.w=100;
+        sq6.h=60;
+        sq6.x=sq5.x-sq6.w-20;
+        sq6.y=topbar.y+10;
+    
+        SDL_Rect squares[]={sq1,sq2,sq3,sq4,sq5,sq6};
+    
+    
+        //login screen rects
+        SDL_Rect loginSquare;
+        loginSquare.w=400;
+        loginSquare.h=250;
+        loginSquare.x=width/2-loginSquare.w/2;
+        loginSquare.y=height/2-loginSquare.h/2;
+    
+        SDL_Rect loginInput;
+        loginInput.w=70;
+        loginInput.h=70;
+        loginInput.x=loginSquare.x+loginSquare.w/2 -loginInput.w/2;
+        loginInput.y=loginSquare.h-loginInput.h/2;
+    
+        SDL_Rect promptBox;
+        promptBox.w=10*strlen(prompt);
+        promptBox.h=40;
+        promptBox.x=loginSquare.x;
+        promptBox.y=loginSquare.y-50;
+    
+        //messaging rects
+        SDL_Rect personBox;
+        personBox.w=width;
+        personBox.h=40;
+        personBox.x=0;
+        personBox.y=topbar.h;
+    
+        SDL_Rect sendBox;
+        sendBox.w=400;
+        sendBox.h=550;
+        sendBox.x=40;
+        sendBox.y=height-10;
+    
+        SDL_Rect label;
+        label.w=300;
+        label.h=60;
+        label.x=width/2-label.w/2;
+        label.y=personBox.y+personBox.h+20;
+    
+        SDL_Rect m1;
+        m1.w=300;
+        m1.h=60;
+        m1.x=width/2-m1.w/2;
+        m1.y=height/2-m1.h/2+label.h;
+    
+        //Enable text input
+        SDL_StartTextInput();
+        SDL_Event windowEvent;
+        SDL_SetWindowIcon(window, icon);
+        while (true){
+            if (SDL_PollEvent(&windowEvent)){
+                if (SDL_QUIT==windowEvent.type){
                     break;
                 }
-                else printf("username taken, please pick a new one\n");
             }
-            printf("enter your password\n");
-            gets(login[1]);
-            send( ConnectSocket, login[1], sizeof(login[1]), 0 );//sending login info
-            memset(login[0], 0, sizeof(login[0]));//resetting the login info
-            memset(login[1], 0, sizeof(login[1]));//resetting the login info
-        }
-        if (accounter[0]=='Y'){
-            printf("enter your username\n");
-            gets(login[0]);
-            send( ConnectSocket, login[0], sizeof(login[0]), 0 );//sending login info
-            printf("enter your password\n");
-            gets(login[1]);
-            send( ConnectSocket, login[1], sizeof(login[1]), 0 );//sending login info
-            recv(ConnectSocket, accounter, 1, 0);
-            //printf("%s\n",accounter);
-            if (strcmp("Y",accounter)==0){
-                printf("You're logged in!\n");
-                logger=true;
-            } else {
-                printf("Wrong login\n");
-            }
-            memset(login[0], 0, sizeof(login[0]));//resetting the login info
-            memset(login[1], 0, sizeof(login[1]));//resetting the login info
-        }
-    }
-
-    fflush(stdin);//I was told to do this by stack overflow to prevent gets() getting skipped
-
-    //message listening
-    unsigned listener;
-    (HANDLE)_beginthreadex(NULL, 0, &messageListener, (void*)ConnectSocket, 0, &listener);
-
-    // Receive until the peer closes the connection
-    do {
-        printf("What is the message you want to send?\n");//asking for new message
-        gets(message);//gets message
-
-        // Sending a message
-        buffer = send( ConnectSocket, message, (int)strlen(message), 0 );
-        if (buffer == SOCKET_ERROR) {
-            printf("send failed with error: %d\n", WSAGetLastError());
-            closesocket(ConnectSocket);
-            WSACleanup();
-            return 1;
-        }
-        char receiver[40];
-        printf("Who do you want to send the message to?\n");//asking for who they want to send it to
-        gets(receiver);//gets message
-        // Sending a message
-        buffer = send( ConnectSocket, receiver, (int)strlen(receiver), 0 );
-        //buffer = recv(ConnectSocket, receive, DEFAULT_BUFLEN, 0);
-
-    } while( buffer > 0 );
-
-    // cleanup
-    shutdown(ConnectSocket, SD_SEND);
-    closesocket(ConnectSocket);
-    WSACleanup();    
-    return 0;
-}
-    </pre>
-    <br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<p class="blurbs">This is a messaging app written in pure C using the winsock library. It has a login system that allows users to sign in with a username of their choice (provided that username isn't taken) and password. It also has an address system that determines which users are signed in. The app works by a user sending a message, indicating who they want to send the message to, and the server sends that message to the person addressed, provided they are online and signed in. A very simple but effective chat app, similar to the chat apps of the early 90s (yes I copy pasted the description from the server above but that's because it's the client side, so together they work towards  that functionality)</p>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<h2 class="labeler">snake in c++</h2>
-<br>
-<br>
-<pre class="scroll">
-#include &ltiostream>
-#include &ltstring>
-#include &lttime.h>
-#include &ltWindows.h>
-#include &ltstdlib.h>
-#include &ltvector>
-#include &ltalgorithm>
-std::string grid="";
-int fruitMaker(){
-    int r = rand()%784;
-    if (grid[r]==' '){
-        return r;
-    } else {
-        return fruitMaker();
-    }
-}
-void gridPrinter(){
-    for (int c=0;c&ltgrid.length();c++){
-        if (c%28==0){
-            std::cout&lt&ltstd::endl;
-        }
-        std::cout&lt&ltgrid[c];
-    }
-}
-int main(){
-    srand(time(NULL));   // Initialization, should only be called once.
-    std::vector&ltint> subs;
-    int x=300,direction=0,buffer=0,score=0,indexer=0;
-    for (int i=1;i<28*28 +1;i++){
-        if (i%28==0||i%28==1||i/28<1||i+28>=28*28){
-            grid+="#";
-        }else {
-            if (i==x){
-                grid+="0";
-            } else {
-                grid+=" ";
-            }
-        }
-    }
-    x--;
-    bool gameTrue=true;
-    int buffer2=0;
-    grid[fruitMaker()]='*';
-    while (gameTrue){
-       system("CLS");
-       subs.resize(indexer);
-       if(direction!=1&&GetKeyState('A') &0x8000){
-            direction=-1;
-        } else if (direction!=-1&&GetKeyState('D') &0x8000){
-            direction=1;
-        } else if (direction!=28&&GetKeyState('W') &0x8000){
-            direction=-28;
-        } else if (direction!=-28&&GetKeyState('S') &0x8000){
-            direction=28;
-        }
-       buffer=grid[x+direction];
-       if (indexer<1){
-            grid[x+direction]=grid[x];
-       }
-       if (direction!=0){
-            grid[x]=' ';
-       }
-       x+=direction;
-       subs.insert(subs.begin(),x);
-       if (direction!=0&&buffer=='#'){
-            gameTrue=false;
-       } else if (buffer=='*'){
-           score++;
-           indexer++;
-           subs.resize(indexer);
-           if (indexer==1){
-                subs[indexer]=x-direction;
-           } else {
-                indexer++;
-                subs[indexer]=subs[indexer-1]-(subs[indexer-2]-subs[indexer-1]);
-           }
-           grid[fruitMaker()]='*';
-       }
-       std::cout&lt&lt"Your score is: "&lt&ltscore;
-       if (indexer>=1){
-            for (int j=0;j&ltsubs.size();++j){
-                grid[subs[j]]='0';
-                if (j==1){
-                    buffer2=subs[j];
-                    subs[j]=subs[j-1];
-                } else if (j>=1){
-                    int temp=subs[j];
-                    subs[j]=buffer2;
-                    buffer2=temp;
-                    if (subs[j]==subs[0]){
-                        gameTrue=false;
+            if( windowEvent.type == SDL_KEYDOWN ){
+                //Handle backspace
+                if( windowEvent.key.keysym.sym == SDLK_BACKSPACE && strlen(input) > 0 ){
+                    //lop off character
+                    input[strlen(input)-1]='\0';
+                }
+    
+                //handling enter button
+                if( windowEvent.key.keysym.sym == SDLK_RETURN && strlen(input) > 0 ){
+                    //account input
+                    if (strcmp(screenType,"login")==0&&strlen(accounter)==0&&strlen(input)!=0&&strcmp(prompt,"do you have an account? Enter Y for yes, or N for no")==0){
+                        if (strlen(input)!=1){
+                            memset(input,0,sizeof(input));
+                            strcpy(input,"");
+                            strcpy(accounter,input);
+                        } else {
+                            memset(accounter,0,sizeof(accounter));
+                            strcpy(accounter,input);
+                            accounter[0]=toupper(accounter[0]);
+                        }
+                        if (accounter[0]=='N'||accounter[0]=='Y'){
+                            bool newUsername=false;
+                            memset(input,sizeof(input),0);
+                            strcpy(input,"");
+    
+                            memset(prompt,sizeof(prompt),0);
+                            if (accounter[0]=='Y') strcpy(prompt,"enter your username");
+                            else strcpy(prompt,"create an account, enter your username");
+                            promptBox.w=10*strlen(prompt);
+                            send( ConnectSocket, accounter, 1, 0 );//sending if user wants to make new account
+                        } else {
+                            memset(input,0,sizeof(input));
+                            strcpy(input,"");
+                            strcpy(accounter,input);
+                        }
+                        //login info if you do have an account
+                    } else if (strcmp(screenType,"login")==0&&strlen(input)!=0&&strcmp(prompt,"enter your username")==0){
+                        strcpy(login[0],input);
+                        send( ConnectSocket, login[0], sizeof(login[0]), 0 );//sending login info
+                        memset(input,sizeof(input),0);
+                        strcpy(input,"");
+                        memset(prompt,sizeof(prompt),0);
+                        strcpy(prompt,"enter your password");
+                        promptBox.w=10*strlen(prompt);
+                        //login info  if you do have an account password
+                    } else if (strcmp(screenType,"login")==0&&strlen(input)!=0&&strcmp(prompt,"enter your password")==0&&accounter[0]=='Y'){
+                        strcpy(login[1],input);
+                        send( ConnectSocket, login[1], sizeof(login[1]), 0 );//sending login info
+                        memset(input,sizeof(input),0);
+                        strcpy(input,"");
+                        recv(ConnectSocket, accounter, 1, 0);
+                        if (accounter[0]=='Y'){
+                            memset(prompt,sizeof(prompt),0);
+                            strcpy(prompt,"You're logged in!");
+                            //message listening
+                            unsigned listener;
+                            (HANDLE)_beginthreadex(NULL, 0, &messageListener, (void*)ConnectSocket, 0, &ltistener);
+                            promptBox.w=10*strlen(prompt);
+                        } else {
+                            memset(prompt,sizeof(prompt),0);
+                            strcpy(prompt,"Wrong login");
+                            promptBox.w=10*strlen(prompt);
+                        }
+                        memset(login[0], 0, sizeof(login[0]));//resetting the login info
+                        memset(login[1], 0, sizeof(login[1]));//resetting the login info
+                        memset(accounter, 0, sizeof(accounter));//resetting the login info
+                        //login if you're making an account username
+                    } else if (strcmp(screenType,"login")==0&&strlen(input)!=0&&(strcmp(prompt,"create an account, enter your username")==0||strcmp(prompt,"username taken, please pick a new one")==0)){
+                        memset(login[0], 0, sizeof(login[0]));//resetting the login info
+                        strcpy(login[0],input);
+                        send( ConnectSocket, login[0], sizeof(login[0]), 0 );//sending login info
+                        char checker[strlen("okie-dokie")+1];
+                        recv(ConnectSocket, checker, strlen("okie-dokie"), 0);
+                        printf(checker);
+                            if (strcmp(checker,"okie-dokie")==0){
+                                memset(input,sizeof(input),0);
+                                strcpy(input,"");
+                                memset(prompt,sizeof(prompt),0);
+                                strcpy(prompt,"enter your password");
+                                promptBox.w=10*strlen(prompt);
+                            } else {
+                                memset(input,sizeof(input),0);
+                                strcpy(input,"");
+                                memset(prompt,sizeof(prompt),0);
+                                strcpy(prompt,"username taken, please pick a new one");
+                                promptBox.w=10*strlen(prompt);
+                            }
+                            //account creation for no account
+                    } else if (strcmp(screenType,"login")==0&&strlen(input)!=0&&strcmp(prompt,"enter your password")==0&&accounter[0]=='N'){
+                        strcpy(login[1],input);
+                        send( ConnectSocket, login[1], sizeof(login[1]), 0 );//sending login info
+                        memset(input,sizeof(input),0);
+                        strcpy(input,"");
+                        memset(login[0], 0, sizeof(login[0]));//resetting the login info
+                        memset(login[1], 0, sizeof(login[1]));//resetting the login info
+                        memset(accounter, 0, sizeof(accounter));//resetting the login info
+                        memset(prompt,sizeof(prompt),0);
+                        strcpy(prompt,"account created");
+                        promptBox.w=10*strlen(prompt);
+                    }
+                    else if (strcmp(screenType,"messaging")==0&&strlen(input)!=0&&strcmp(prompt,"enter the message you want to send")==0){
+                        memset(text,0,sizeof(text));
+                        strcpy(text,input);
+                        memset(input,0,sizeof(input));
+                        strcpy(input,"");
+                        // Sending a message
+                        send( ConnectSocket, text, (int)strlen(text), 0 );
+                        memset(prompt,0,sizeof(prompt));
+                        strcpy(prompt,"who do you want to message?");
+                    }
+                    else if (strcmp(screenType,"messaging")==0&&strlen(input)!=0&&strcmp(prompt,"who do you want to message?")==0){
+                        char receiver[40];
+                        strcpy(receiver,input);
+                        send( ConnectSocket, receiver, (int)strlen(receiver), 0 );//message
+                        memset(input,sizeof(input),0);
+                        strcpy(input,"");
+                        memset(prompt,sizeof(prompt),0);
+                        strcpy(prompt,"enter the message you want to send");
                     }
                 }
             }
-       }
-       grid[0]='#';
-       gridPrinter();
-       if (indexer>=1){
-            std::replace( grid.begin(), grid.end(), '0', ' ');
-       }
+                        //Special text input event
+            else if( windowEvent.type == SDL_TEXTINPUT ){
+                //Not copy or pasting
+                if( !( SDL_GetModState() & KMOD_CTRL && ( windowEvent.text.text[ 0 ] == 'c' || windowEvent.text.text[ 0 ] == 'C' || windowEvent.text.text[ 0 ] == 'v' || windowEvent.text.text[ 0 ] == 'V' ) ) )
+                    {
+                                //Append character
+                        if (strcmp(prompt,"do you have an account? Enter Y for yes, or N for no")==0&&strlen(input)==0) strcat( input,windowEvent.text.text);
+                        else if (strcmp(prompt,"do you have an account? Enter Y for yes, or N for no")!=0) strcat( input,windowEvent.text.text);
+                    }
+                }
+            SDL_FillRect(screen,NULL,230219217);
+            SDL_FillRect(screen,&topbar,122241255);
+            SDL_FillRect(screen,&bottombar,122241255);
+    
+            //coloring in the boxes for the login screen
+            if (strcmp(screenType,"login")==0){
+                SDL_FillRect(screen,&ltoginSquare,122241255);
+                SDL_FillRect(screen,&ltoginInput,255255255);
+                SDL_FillRect(screen,&promptBox,122241255);
+            }
+    
+            if (strcmp(screenType,"messaging")==0){
+                SDL_FillRect(screen,&sendBox,255255255);
+                SDL_FillRect(screen,&personBox,255255255);
+            }
+    
+            SDL_Texture * texture=SDL_CreateTextureFromSurface(renderer, screen);
+            SDL_RenderCopy(renderer, texture, NULL, NULL);//placing the background
+            SDL_Surface* title = TTF_RenderText_Solid(Sans, "HERMES", black);//title
+            SDL_Texture* titleText = SDL_CreateTextureFromSurface(renderer, title);
+            SDL_RenderCopy(renderer, titleText, NULL, &titleRect);
+    
+            //text for login screen
+            if (strcmp(screenType,"login")==0){
+                char* promptBuf=prompt;
+                SDL_Surface* psurface = TTF_RenderText_Solid(Sans, promptBuf, black);//prompt
+                SDL_Texture* ptext = SDL_CreateTextureFromSurface(renderer, psurface);
+                SDL_RenderCopy(renderer, ptext, NULL, &promptBox);
+    
+                char* inputBuf=input;
+                SDL_Surface* isurface = TTF_RenderText_Solid(Sans, inputBuf, black);//prompt
+                SDL_Texture* itext = SDL_CreateTextureFromSurface(renderer, isurface);
+                //fixing the text resize bug
+                SDL_Rect loginInputT;
+                loginInputT.x=loginInput.x;
+                loginInputT.y=loginInput.y;
+                loginInputT.w=loginInput.w;
+                loginInputT.h=loginInput.h;
+    
+                TTF_SetFontSize(Sans, 70);
+                if (strlen(inputBuf)!=0) {
+                    loginInputT.w=isurface->w;
+                    loginInputT.h=isurface->h;
+                    if (strcmp(prompt,"do you have an account? Enter Y for yes, or N for no")!=0) {
+                        loginInput.w=isurface->w;
+                        loginInput.h=isurface->h;
+                    } else {
+                        loginInput.w=70;
+                        loginInput.h=70;
+                    }
+                    loginInput.x=loginSquare.x+loginSquare.w/2 -loginInput.w/2;
+                    loginInput.y=loginSquare.h-loginInput.h/2;
+                }
+                SDL_RenderCopy(renderer, itext, NULL, &ltoginInputT);
+    
+                SDL_FreeSurface(psurface);
+                SDL_DestroyTexture(ptext);
+    
+                SDL_FreeSurface(isurface);
+                SDL_DestroyTexture(itext);
+    
+            }
+    
+            //text for messaging screen
+            if (strcmp(screenType,"messaging")==0){
+                char* inputBuf=input;
+                TTF_SetFontSize(Sans, 40);
+                SDL_Surface* isurface = TTF_RenderText_Solid(Sans, inputBuf, black);//prompt
+                SDL_Texture* itext = SDL_CreateTextureFromSurface(renderer, isurface);
+                if (strlen(inputBuf)!=0){
+                    sendBox.w=isurface->w;
+                    sendBox.h=isurface->h;
+                } else {
+                    sendBox.w=400;
+                    sendBox.h=50;
+                }
+                SDL_RenderCopy(renderer, itext, NULL, &sendBox);
+    
+                char* promptBuf=prompt;
+                SDL_Surface* psurface = TTF_RenderText_Solid(Sans, promptBuf, black);//prompt
+                SDL_Texture* ptext = SDL_CreateTextureFromSurface(renderer, psurface);
+                SDL_RenderCopy(renderer, ptext, NULL, &personBox);
+    
+                char* labelText="last message received";
+                SDL_Surface* lsurface = TTF_RenderText_Solid(Sans, labelText, black);//prompt
+                SDL_Texture* ltext = SDL_CreateTextureFromSurface(renderer, lsurface);
+                SDL_RenderCopy(renderer, ltext, NULL, &ltabel);
+    
+                char* lastText=lastMessage;
+                TTF_SetFontSize(Sans, 40-strlen(lastMessage)/30);
+                SDL_Surface* ltsurface = TTF_RenderText_Solid(Sans, lastText, black);//prompt
+                SDL_Texture* lttext = SDL_CreateTextureFromSurface(renderer, ltsurface);
+                if (strlen(lastMessage)!=0){
+                    m1.w=ltsurface->w;
+                    m1.h=ltsurface->h;
+                    m1.x=width/2-m1.w/2;
+                    m1.y=height/2-m1.h/2+label.h;
+                }
+                TTF_SetFontSize(Sans, 70);
+    
+                SDL_RenderCopy(renderer, lttext, NULL, &m1);
+    
+                SDL_FreeSurface(isurface);
+                SDL_DestroyTexture(itext);
+    
+                SDL_FreeSurface(psurface);
+                SDL_DestroyTexture(ptext);
+    
+                SDL_FreeSurface(lsurface);
+                SDL_DestroyTexture(ltext);
+    
+                SDL_FreeSurface(ltsurface);
+                SDL_DestroyTexture(lttext);
+            }
+    
+            for (int i=0;i&lt6;i++) drawCircle(renderer,squares[i].x+squares[i].w/2,squares[0].y+squares[0].h/2,30);
+            SDL_RenderPresent(renderer);
+    
+            // Don't forget to free your surface and texture
+            SDL_FreeSurface(title);
+            SDL_DestroyTexture(titleText);
+            SDL_DestroyTexture(texture);
+    
+            if (strcmp(prompt,"Wrong login")==0||strcmp(prompt,"account created")==0){
+                SDL_Delay(500);
+                memset(prompt,sizeof(prompt),0);
+                strcpy(prompt,"do you have an account? Enter Y for yes, or N for no");
+                promptBox.w=10*strlen(prompt);
+                memset(input,sizeof(input),0);
+                strcpy(input,"");
+            }
+            if  (strcmp(prompt,"You're logged in!")==0) {
+                SDL_Delay(500);
+                memset(screenType,0,sizeof(screenType));
+                strcpy(screenType,"messaging");
+                memset(prompt,sizeof(prompt),0);
+                strcpy(prompt,"enter the message you want to send");
+                bottombar.y-=50;
+                bottombar.h+=50;
+                sendBox.y-=50;
+                sendBox.h-=200;
+            }
+        }
+        //cleanup
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        shutdown(ConnectSocket, SD_SEND);
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 0;
     }
-    return 0;
-}
-
     </pre>
     <br>
 <br>
@@ -687,7 +947,12 @@ int main(){
 <br>
 <br>
 <br>
-<p class="blurbs">This is snake, written in C++, I have other C/C++ test files and projects, but for now, this is what I'm gonna put up and I'll modify this page later. It's what it sounds like, snake, in C++ console. Just boot up codeblocks and run it and you'll get to play good ol' classic snake</p>
+<br>
+<p class="blurbs">This is the client side of the messaging app, again, written entirely in C. The client functions by connecting to the server (obviously
+    the server and client are binded to the right IP, although this would vary if you tried running this at home) and then allowing you to login. The GUI was made
+    using SDL2. Getting the client and server side to sync up along with the GUI was a massively fun (even if nightmarish) process, but I enjoyed it and I always try to think
+    of ways to modify and improve this code, below is an example of 2 of the clients communicating with each other
+</p>
 <br>
 <br>
 <br>
@@ -695,171 +960,1190 @@ int main(){
 <br>
 <br>
 <br>
-<h2 class="labeler">discord  bot</h2>
+<img src="messagingApp.png" style=" display:block;margin:0 auto 0 auto; width:1100px; border-right-width: 20px;border-left-width: 20px; border-left-style: solid; border-right-style: solid;border-color: #e2d7c5"  />
+<br>
+<br>
+<br>
+<br>
+<h2 class="labeler">fighting game in c++</h2>
 <br>
 <br>
 <pre class="scroll">
-import os,discord,youtube_dl,asyncio
-from dotenv import load_dotenv
-from discord.ext import commands,tasks 
-from discord.voice_client import VoiceClient
-load_dotenv()
-
-TOKEN = os.getenv('TOKEN')
-intents = discord.Intents().all()
-bot = commands.Bot(command_prefix='-',intents=intents)
-
-
-#bot variables
-ben=[True]
-songQueue=[]
-pastSongs=[]
-vc=[""]
-
-
-
-@bot.event
-async def on_ready():
-    print(f'{bot.user.name} has connected to Discord!')
-
-#my pain
-
-youtube_dl.utils.bug_reports_message = lambda: ''
-
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
-}
-
-ffmpeg_options = {
-    'options': '-vn'
-}
-
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-
-class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
-        super().__init__(source, volume)
-        self.data = data
-        self.title = data.get('title')
-        self.url = ""
-
-    @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
-        filename = data['title'] if stream else ytdl.prepare_filename(data)
-        return filename
-@bot.event
-async def on_message(message):
-    await bot.process_commands(message)
-    channel=message.channel
-    print(channel)
-    print(message.content)
-    try:
-        if len(pastSongs)>0 and pastSongs[0][1]:
-            os.remove(pastSongs[0][0])
-            pastSongs.pop()
-    except:
-        print("kys loser")
-    if message.author == bot.user:
-        return
-
-    if message.content.lower() == 'kys':
-        response = "https://tenor.com/view/ltg-low-tier-god-yskysn-ltg-thunder-thunder-gif-23523876"
-        await message.channel.send(response)
-    elif message.content.lower() == 'ben' and ben[0]==True:
-        response = "https://tenor.com/view/talking-ben-says-saying-no-outfit7-gif-24967985"
-        await message.channel.send(response)
-    elif message.content.lower() == 'yipee':
-        response = "https://tenor.com/view/yippee-happy-celebration-joy-confetti-gif-25557730"
-        await message.channel.send(response)
-    elif message.content.lower() == 'marie dog':
-        response = "<:whomthefuck:947335702100734013>"
-        await message.channel.send(response)
-    else:
-        return
-        
-@bot.command(name='join')
-async def join(ctx):
-    print("you're bad")
-    if ctx.message.author.voice.channel is None:
-        await ctx.send("{} is not connected to a voice channel".format(ctx.message.author.name))
-        return
-    else:
-        channel = ctx.message.author.voice.channel
-        ctx.send("I have joinedeth")
-    await channel.connect()
-
-@bot.command(name='leave')
-async def leave(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_connected():
-        await voice_client.disconnect()
-        await ctx.send("I have left")
-    else:
-        await ctx.send("The bot is not connected to a voice channel.")
-@bot.command(name='playSong', help='To play song')
-async def play(ctx,url):
-    try:
-        server = ctx.message.guild
-        voice_channel = server.voice_client
-        filename = await YTDLSource.from_url(url, loop=bot.loop)
-        print(filename)
-        voice_client = ctx.message.guild.voice_client
-        voice_channel.play(discord.FFmpegPCMAudio(executable="ffmpeg.exe", source=filename))
-        await ctx.send('**Now playing:** {}'.format(filename))
-        pastSongs.append([filename,voice_client])
-
-    except:
-        ctx.send("you are bad and stinky")
-
-@bot.command(name='pause', help='This command pauses the song')
-async def pause(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_playing():
-        await voice_client.pause()
-    else:
-        await ctx.send("The bot is not playing anything at the moment.")
+    #include &ltiostream>
+    #include &ltmemory>
+    #include &ltWindows.h>
+    #include &ltprocess.h>
+    #include &ltstring>
+    #include &ltSDL2/SDL.h>
+    #include &ltSDL2/SDL_image.h>
+    #include &ltSDL2/SDL_ttf.h>
+     
+    const int width=1024,height=576;//screen proportions
+    const double gravity=0.7;//gravity
+    bool end=false;//value to see if the game ended
     
-@bot.command(name='resume', help='Resumes the song')
-async def resume(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_paused():
-        await voice_client.resume()
-    else:
-        await ctx.send("The bot was not playing anything before this. Use play_song command")
+    struct spriteTemplate {//sprite struct
+        std::string imageSrc;
+        std::string backwardsImg;
+        int framesMax;
+        int framesHold;
+        struct {
+            int height;
+            int width;
+        } scales;
+        int offset;
+    };
+    struct character {//character struct
+        double position[2];
+        double velocity[2];
+        struct {
+            int x;
+            int y;
+            int width;
+            int height;
+            int knockback;
+            int frame;
+        } attackStats;
+        std::string imageSrc;
+        int framesMax;
+        int framesHold;
+        int framesElapsed;
+        int currentFrame=1;
+        struct {
+            spriteTemplate idle;
+            spriteTemplate run;
+            spriteTemplate jump;
+            spriteTemplate fall;
+            spriteTemplate attack1;
+            spriteTemplate takeHit;
+            spriteTemplate death;
+        } sprites;
+        int height;
+        int width;
+        int speed;
+        int jumpH;
+        int offset;
+    };
+    
+    character Richard {
+        {400,100},//position
+        {0,0},//velocity
+         {
+            50,//x
+            67,//y
+            200,//width
+            100,//height
+            30,//knockback
+            3//frame
+        },//attackStats
+        "richardIdle.png",//imgSrc
+        8,//framesMax
+        6,//framesHold
+        0,//framesElapsed
+        1,//currentFrame
+         {//sprites struct
+             {
+                "richardIdle.png",
+                "richardIdlebackwards.png",
+                8,
+                6,
+                 {
+                    200,
+                    250
+                },
+                16
+            },
+             {
+                "richardRun.png",
+                "richardRunbackwards.png",
+                7,
+                9,
+                 {
+                    200,
+                    250
+                },
+                0
+            },
+             {
+                "richardJump.png",
+                "richardJumpbackwards.png",
+                2,
+                12,
+                 {
+                    230,
+                    260
+                },
+                20
+            },
+             {
+                "richardFall.png",
+                "richardFallbackwards.png",
+                2,
+                5,
+                 {
+                    200,
+                    250
+                },
+                30
+            },
+             {
+                "richardAttack1.png",
+                "richardAttack1backwards.png",
+                5,
+                8,
+                 {
+                    200,
+                    250
+                },
+                0
+            },
+             {
+                "richardTake hit.png",
+                "richardTake hitbackwards.png",
+                5,
+                4,
+                 {
+                    200,
+                    250
+                },
+                23
+            },
+             {
+                "richardDeath.png",
+                "richardDeathbackwards.png",
+                9,
+                6,
+                 {
+                    200,
+                    250
+                },
+                0 
+            }
+        },
+        200,//height
+        250,//width
+        3,//speed
+        13,//jump height
+        16//offset
+    };
+    character Dracaena {
+        {0,100},//position
+        {0,0},//velocity
+         {
+            90,//x
+            38,//y
+            93,//width
+            58,//height
+            20,//knockback
+            3//frame
+        },//attackStats
+        "dracIdle.png",//imgSrc
+        4,//framesMax
+        15,//framesHold
+        0,//framesElapsed
+        1,//currentFrame
+         {//sprites struct
+             {
+                "dracIdle.png",
+                "dracIdlebackwards.png",
+                4,
+                15,
+                 {
+                    170,
+                    180
+                },
+                70
+            },
+             {
+                "dracRun.png",
+                "dracRunbackwards.png",
+                11,
+                7,
+                 {
+                    170,
+                    210
+                },
+                15
+            },
+             {
+                "dracJump.png",
+                "dracJumpbackwards.png",
+                3,
+                7,
+                 {
+                    160,
+                    190
+                },
+                100
+            },
+             {
+                "dracFall.png",
+                "dracFallbackwards.png",
+                2,
+                2,
+                 {
+                    150,
+                    180
+                },
+                100
+            },
+             {
+                "dracAttack1.png",
+                "dracAttack1backwards.png",
+                4,
+                10,
+                 {
+                    170,
+                    210
+                },
+                40
+            },
+             {
+                "dracTake hit.png",
+                "dracTake hitbackwards.png",
+                3,
+                11,
+                 {
+                    170,
+                    190
+                },
+                132
+            },
+             {
+                "dracDeath.png",
+                "dracDeathbackwards.png",
+                10,
+                9,
+                 {
+                    170,
+                    210
+                },
+                20 
+            }
+        },
+        170,//height
+        210,//width
+        6,//speed
+        15,//jump height
+        106//offset
+    };
+    
+    struct {
+        struct {
+            bool pressed=false;
+        } a;
+        struct {
+            bool pressed=false;
+        } d;
+        struct {
+            bool pressed=false;
+        } w;
+        struct {
+            bool pressed=false;
+        } ArrowLeft;
+        struct {
+            bool pressed=false;
+        } ArrowRight;
+        struct {
+            bool pressed=false;
+        } ArrowUp;
+    } keys;
+    
+    class LTimer {
+        public:
+            //Initializes variables
+            LTimer();
+    
+            //The various clock actions
+            void start();
+            void stop();
+            void pause();
+            void unpause();
+    
+            //Gets the timer's time
+            Uint32 getTicks();
+    
+            //Checks the status of the timer
+            bool isStarted();
+            bool isPaused();
+    
+        private:
+            //The clock time when the timer started
+            Uint32 mStartTicks;
+    
+            //The ticks stored when the timer was paused
+            Uint32 mPausedTicks;
+    
+            //The timer status
+            bool mPaused;
+            bool mStarted;
+    };
+    LTimer::LTimer(){
+        //Initialize the variables
+        mStartTicks = 0;
+        mPausedTicks = 0;
+    
+        mPaused = false;
+        mStarted = false;
+    }
+    void LTimer::start(){
+        //Start the timer
+        mStarted = true;
+    
+        //Unpause the timer
+        mPaused = false;
+    
+        //Get the current clock time
+        mStartTicks = SDL_GetTicks();
+        mPausedTicks = 0;
+    }
+    void LTimer::stop(){
+        //Stop the timer
+        mStarted = false;
+    
+        //Unpause the timer
+        mPaused = false;
+    
+        //Clear tick variables
+        mStartTicks = 0;
+        mPausedTicks = 0;
+    }
+    void LTimer::pause(){
+        //If the timer is running and isn't already paused
+        if( mStarted && !mPaused )
+        {
+            //Pause the timer
+            mPaused = true;
+    
+            //Calculate the paused ticks
+            mPausedTicks = SDL_GetTicks() - mStartTicks;
+            mStartTicks = 0;
+        }
+    }
+    void LTimer::unpause(){
+        //If the timer is running and paused
+        if( mStarted && mPaused )
+        {
+            //Unpause the timer
+            mPaused = false;
+    
+            //Reset the starting ticks
+            mStartTicks = SDL_GetTicks() - mPausedTicks;
+    
+            //Reset the paused ticks
+            mPausedTicks = 0;
+        }
+    }
+    Uint32 LTimer::getTicks(){
+        //The actual timer time
+        Uint32 time = 0;
+    
+        //If the timer is running
+        if( mStarted )
+        {
+            //If the timer is paused
+            if( mPaused )
+            {
+                //Return the number of ticks when the timer was paused
+                time = mPausedTicks;
+            }
+            else
+            {
+                //Return the current time minus the start time
+                time = SDL_GetTicks() - mStartTicks;
+            }
+        }
+    
+        return time;
+    }
+    bool LTimer::isStarted(){
+        //Timer is running and paused or unpaused
+        return mStarted;
+    }
+    
+    bool LTimer::isPaused(){
+        //Timer is running and paused
+        return mPaused && mStarted;
+    }
+    class fighter {
+        public:
+        SDL_Surface * sprite;
+        SDL_Rect og;//rectangle of og image
+        SDL_Rect target;//where I want to place the image
+        SDL_Rect attackBox;//where I want to place the image
+        SDL_Texture * fImage;
+        int framesElapsed=0;
+        int currentFrame=1;
+        int framesMax;
+        int framesHold;
+        struct character buffer;
+        bool dead=false;
+        bool isAttacking=false;
+        bool attackPress=true;
+        std::string lastKey;
+        int jumpArc=0;
+        int jumpH;
+        int speed;
+        int health=100;
+        SDL_Renderer * renderer;
+        int frameWidth;
+    
+        fighter(struct character player,SDL_Renderer * renderer1){
+            framesMax=player.framesMax;
+            framesHold=player.framesHold;
+            buffer=player;
+            speed=buffer.speed;
+            jumpH=buffer.jumpH;
+            sprite = IMG_Load((player.imageSrc).c_str());//loading an image
+            og.x = buffer.offset;
+            og.y = 0;
+            frameWidth=(sprite->w/framesMax);
+            if (sprite->w%framesMax!=0) frameWidth++;
+            og.w = frameWidth-buffer.offset;
+            og.h = sprite->h;
+            attackBox.x = player.attackStats.x;
+            attackBox.y = player.attackStats.y;
+            attackBox.w = player.attackStats.width;
+            attackBox.h = player.attackStats.height;
+            target.x = player.position[0];
+            target.y = player.position[1];
+            target.w = og.w;
+            target.h = buffer.height;
+            renderer=renderer1;
+            fImage=SDL_CreateTextureFromSurface(renderer,sprite);
+            
+        }
+        void draw(){
+            SDL_DestroyTexture(fImage);//memory leak prevention
+            target.x=buffer.position[0];
+            target.y=buffer.position[1];
+            fImage = SDL_CreateTextureFromSurface(renderer, sprite);//rendering the sprite
+            SDL_RenderCopy(renderer, fImage, &og, &target);//placing the sprite
+        }
+        void attack(std::string direction=""){
+            switchSprite(4,direction);
+            if (direction=="") attackBox.x=target.x+buffer.attackStats.x;
+            else attackBox.x=target.x+target.w-buffer.attackStats.x-buffer.attackStats.width;
+            attackBox.w=buffer.attackStats.width;
+            attackBox.y=target.y+buffer.attackStats.y;
+            attackBox.h=buffer.attackStats.height;
+            isAttacking=true;
+        }
+        void takeHit(std::string direction=""){
+            health-=20;
+            if (health&lt=0) switchSprite(6,direction);
+            else switchSprite(5,direction);
+        }
+        void animateFrames(float timeStep){
+            if (timeStep*100>=.6){
+                og.x = currentFrame * frameWidth + buffer.offset;
+                framesElapsed++;
+                if (framesElapsed%framesHold==0){
+                    if (currentFrame&ltframesMax-1){
+                        currentFrame++;
+                    } else {
+                        currentFrame=0;
+                    }
+                }
+            }
+        }
+        void update(float timeStep){
+            draw();
+            if (!dead) animateFrames(timeStep);
+            if ((buffer.imageSrc==buffer.sprites.death.imageSrc||buffer.imageSrc==buffer.sprites.death.backwardsImg)&&buffer.position[1]==479-target.h) return;
+            buffer.position[1] +=buffer.velocity[1]*timeStep*100;
+    
+            //border detection
+            if (target.x+target.w+buffer.velocity[0]>width) buffer.position[0]=width-target.w;
+            else if (target.x+buffer.velocity[0]&lt0) buffer.position[0]=0;
+            else buffer.position[0] +=buffer.velocity[0]*timeStep*100;
+    
+            //gravity detection
+            if (target.y+target.h+buffer.velocity[1]>=479){
+                buffer.velocity[1]=0;
+                buffer.position[1]=479-target.h;
+                if (buffer.velocity[0]==0) jumpArc=0;
+            } else {
+                buffer.velocity[1]+=gravity;
+            }
+        }
+        void swapper(spriteTemplate currentSprite,std::string direction=""){
+            if (direction=="backwards") buffer.imageSrc=currentSprite.backwardsImg;
+            else buffer.imageSrc=currentSprite.imageSrc;
+            SDL_FreeSurface(sprite);
+            framesMax=currentSprite.framesMax;
+            framesHold=currentSprite.framesHold;
+            buffer.height=currentSprite.scales.height;
+            buffer.width=currentSprite.scales.width;
+            buffer.offset=currentSprite.offset;
+            target.h=buffer.height;
+            target.w=buffer.width;
+            sprite = IMG_Load((buffer.imageSrc).c_str());
+            og.x=currentSprite.offset;
+            og.y=0;
+            frameWidth=(sprite->w/framesMax);
+            if (sprite->w%framesMax!=0) frameWidth++;
+            og.w = frameWidth-currentSprite.offset;
+            og.h = sprite->h;
+            currentFrame=0;
+            framesElapsed=0;
+            if (target.y+target.h>=479) buffer.position[1]-=target.y+target.h-479;
+        }
+        std::string switchSprite(int pos,std::string direction=""){
+            if (dead) return "";
+            if (buffer.imageSrc==buffer.sprites.death.imageSrc||buffer.imageSrc==buffer.sprites.death.backwardsImg) {
+                if (currentFrame==buffer.sprites.death.framesMax-1) dead=true;
+                return "";
+            }
+            if ((buffer.imageSrc==buffer.sprites.takeHit.imageSrc||buffer.imageSrc==buffer.sprites.takeHit.backwardsImg)&&currentFrame&ltbuffer.sprites.takeHit.framesMax-1) return "";
+            if ((buffer.imageSrc==buffer.sprites.attack1.imageSrc||buffer.imageSrc==buffer.sprites.attack1.backwardsImg)&&currentFrame==buffer.sprites.attack1.framesMax-1) isAttacking=false;
+            if ((buffer.imageSrc==buffer.sprites.attack1.imageSrc||buffer.imageSrc==buffer.sprites.attack1.backwardsImg)&&currentFrame&ltbuffer.sprites.attack1.framesMax-1) return "";
+           
+            switch (pos){
+                case 0:
+                    if (buffer.imageSrc!=buffer.sprites.idle.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.idle.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.idle,direction);
+                    break;
+                case 1:
+                    if (buffer.imageSrc!=buffer.sprites.run.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.run.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.run,direction);
+                    break;
+                case 2:
+                    if (buffer.imageSrc!=buffer.sprites.jump.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.jump.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.jump,direction);
+                    break;
+                case 3:
+                    if (buffer.imageSrc!=buffer.sprites.fall.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.fall.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.fall,direction);
+                    break;
+                case 4:
+                    if (buffer.imageSrc!=buffer.sprites.attack1.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.attack1.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.attack1,direction);
+                    break;
+                case 5:
+                    if (buffer.imageSrc!=buffer.sprites.takeHit.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.takeHit.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.takeHit,direction);
+                    break;
+                case 6:
+                    if (buffer.imageSrc!=buffer.sprites.death.imageSrc&&direction==""||(buffer.imageSrc !=buffer.sprites.death.backwardsImg&&direction=="backwards")) 
+                    swapper(buffer.sprites.death,direction);
+                    break;
+            }
+            return "";
+        }
+    
+    };
+    
+    bool rectangleCollision(SDL_Rect rect1,SDL_Rect rect2){
+        return ((rect1.x+rect1.w>=rect2.x&&rect1.x+rect1.w&lt=rect2.x+rect2.w)||(rect1.x>=rect2.x&&rect1.x&lt=rect2.x+rect2.w))&&((rect1.y+rect1.h>=rect2.y&&rect1.y+rect1.h&lt=rect2.y+rect2.h)||(rect1.y>=rect2.y&&rect1.y&lt=rect2.y+rect2.h));
+    }
+    int timerValue=60;
+    unsigned __stdcall decreaseTimer(void * data){
+        int *tptr=&timerValue;
+        if (*tptr>0&&!end){
+            SDL_Delay(1000);
+            *tptr=timerValue-1;
+            decreaseTimer(data);
+        }
+        return 0;
+    }
+    int main(int argc,char *argv[]){
+        bool quit = false;
+        SDL_Event event;
+    
+        //initializing everything
+        SDL_Init( SDL_INIT_EVERYTHING );
+        IMG_Init(IMG_INIT_PNG);
+        IMG_Init(IMG_INIT_JPG);
+        TTF_Init();
+    
+        SDL_Window * window = SDL_CreateWindow("Fighting Game",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);//creating a window
+        SDL_Surface * icon=IMG_Load("penisforeskinicon.JPG");//the tab icon
+        SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);//creating the renderer
+        SDL_Texture * texture;//rendering the background
+        SDL_Rect container;//the container for health bars and timer
+        TTF_Font* Sans = TTF_OpenFont("The Wild Breath of Zelda.otf", 24);//the font
+        SDL_Color White = {255, 255, 255};
+        std::string screen="menu";//the string that stores the current screen
+        
+        SDL_Rect playButton;//menu rect
+        playButton.x=80;
+        playButton.w=200;
+        playButton.y=100;
+        playButton.h=100;
+        SDL_Rect credit;
+        credit.x=80;
+        credit.w=900;
+        credit.y=playButton.y+playButton.h+20;
+        credit.h=120;
+    
+        //select screen rects and select screen stuff
+        SDL_Surface *portraits[2]={IMG_Load("dracPortrait.PNG"),IMG_Load("richardPortrait.PNG")};
+        SDL_Texture *portraitTextures[2]={SDL_CreateTextureFromSurface(renderer, portraits[0]),SDL_CreateTextureFromSurface(renderer, portraits[1])};
+        SDL_Rect backButton;
+        backButton.x=80;
+        backButton.w=140;
+        backButton.y=50;
+        backButton.h=100;
+        SDL_Rect characterBox[2];
+        characterBox[0].x=405;
+        characterBox[0].y=205;
+        characterBox[0].w=50;
+        characterBox[0].h=50;
+        SDL_Rect characters[2];
+        characters[0].x=400;
+        characters[0].y=200;
+        characters[0].w=60;
+        characters[0].h=60;
+        for (int i=1,x=0;i&lt2;i++,x+=10){
+            characters[i].x=characters[i-1].x+characters[i-1].w+10;
+            characters[i].y=200;
+            characters[i].w=60;
+            characters[i].h=60;
+            characterBox[i].x=characters[i-1].x+characters[i-1].w+15;
+            characterBox[i].y=205;
+            characterBox[i].w=50;
+            characterBox[i].h=50;
+        }
+    
+        //setting the container properties
+        container.w=800;
+        container.h=60;
+        container.x=(width/2)-(container.w/2);
+        container.y=10;
+        //the invidual healthbar and timer stuff
+        SDL_Rect healthBar1;
+        SDL_Rect healthBar2;
+        SDL_Rect healthBarBack1;
+        SDL_Rect healthBarBack2;
+        SDL_Rect timer;
+        healthBarBack1.w=360;
+        healthBarBack1.x=container.x+5;
+        healthBarBack1.y=container.y+5;
+        healthBarBack1.h=50;
+        healthBarBack2.w=360;
+        healthBarBack2.x=container.x+5+healthBarBack1.w+70;
+        healthBarBack2.y=container.y+5;
+        healthBarBack2.h=50;
+        healthBar1.w=355;
+        healthBar1.x=healthBarBack1.x+5;
+        healthBar1.y=healthBarBack1.y+5;
+        healthBar1.h=40;
+        healthBar2.w=355;
+        healthBar2.x=container.x+5+healthBarBack1.w+70;
+        healthBar2.y=healthBarBack2.y+5;
+        healthBar2.h=40;
+        timer.w=70;
+        timer.h=60;
+        timer.x=container.x+5+healthBarBack1.w;
+        timer.y=container.y;
+    
+        SDL_Rect endMessage; //create a rect
+        endMessage.x = width/2 - 300/2;  //controls the rect's x coordinate 
+        endMessage.y = height/2 - 300/2; // controls the rect's y coordinte
+        endMessage.w = 300; // controls the width of the rect
+        endMessage.h = 300; // controls the height of the rect
+        SDL_SetWindowIcon(window, icon);//setting the window
+        SDL_Event windowEvent;
+    
+        int xMouse=0, yMouse=0;//I have absolutely no fucking idea what I'm doing
+    
+        fighter * player=NULL;//initializing the fighters, gonna redo this later so you can select your fighter
+        fighter *enemy=NULL;
+    
+        LTimer stepTimer;
+        //starting the timer, gotta move this when I do the character select shit
+        int *tptr=&timerValue;
+        //the while loop for the game
+        while (true){
+            if (SDL_PollEvent(&windowEvent)){
+                if (SDL_QUIT==windowEvent.type){
+                    break;
+                }
+            }
+            
+            //menu screen
+            if (screen=="menu"){
+                SDL_Surface * image = IMG_Load("background.png");//loading the background image
+                SDL_Surface* play = TTF_RenderText_Solid(Sans, "PLAY", White); 
+                SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, play);
+                SDL_Surface* credits = TTF_RenderText_Solid(Sans, "Credit to pkmarie04 and nacho_cheeze for sprites", White); 
+                SDL_Texture* credMessage = SDL_CreateTextureFromSurface(renderer, credits);
+    
+                if(windowEvent.type == SDL_MOUSEMOTION) SDL_GetMouseState(&xMouse,&yMouse);
+                if ((xMouse&lt=playButton.x+playButton.w&&xMouse>=playButton.x)&&(yMouse&lt=playButton.y+playButton.h&&yMouse>=playButton.y)) SDL_FillRect(image,&playButton,0xFF0000FF);
+                texture = SDL_CreateTextureFromSurface(renderer, image);//rendering the background
+                SDL_RenderCopy(renderer, texture, NULL, NULL);//placing the background
+                SDL_RenderCopy(renderer, Message, NULL, &playButton);
+                SDL_RenderCopy(renderer, credMessage, NULL, &credit);
+                SDL_RenderPresent(renderer);
+                SDL_RenderClear(renderer);//might change this later, currently used so healthbar rects render properly
+                SDL_FreeSurface(play);
+                SDL_DestroyTexture(Message);
+                SDL_FreeSurface(credits);
+                SDL_DestroyTexture(credMessage);
+                SDL_FreeSurface(image);
+                SDL_DestroyTexture(texture);
+                if(windowEvent.type == SDL_MOUSEBUTTONDOWN) {
+                    if (windowEvent.button.button==SDL_BUTTON_LEFT&&((xMouse&lt=playButton.x+playButton.w&&xMouse>=playButton.x)&&(yMouse&lt=playButton.y+playButton.h&&yMouse>=playButton.y))) {
+                        screen="select";
+                        xMouse=0;
+                        yMouse=0;
+                    }
+                }
+            }
+    
+            //select screen
+            if (screen=="select"){
+                SDL_Surface * image = IMG_Load("background.png");//loading the background image
+                if(windowEvent.type == SDL_MOUSEMOTION) SDL_GetMouseState(&xMouse,&yMouse);
+                if ((xMouse&lt=backButton.x+backButton.w&&xMouse>=backButton.x)&&(yMouse&lt=backButton.y+backButton.h&&yMouse>=backButton.y)) SDL_FillRect(image,&backButton,0xFF0000FF);
+                SDL_FillRects(image,characters,2,0xFFF00000);
+                texture = SDL_CreateTextureFromSurface(renderer, image);//rendering the background
+                SDL_Surface* back = TTF_RenderText_Solid(Sans, "BACK", White); 
+                SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, back);
+                SDL_RenderCopy(renderer, texture, NULL, NULL);//placing the background
+                SDL_RenderCopy(renderer, Message, NULL, &backButton);//placing the text for the back button
+                for (int i=0;i&ltt2;i++){
+                    SDL_RenderCopy(renderer, portraitTextures[i], NULL, &characterBox[i]);
+                }
+                SDL_RenderPresent(renderer);
+                SDL_RenderClear(renderer);//might change this later, currently used so healthbar rects render properly
+                SDL_FreeSurface(image);
+                SDL_DestroyTexture(texture);
+                SDL_FreeSurface(back);
+                SDL_DestroyTexture(Message);
+                if(windowEvent.type == SDL_MOUSEBUTTONDOWN) {
+                    if (windowEvent.button.button==SDL_BUTTON_LEFT&&((xMouse&lt=backButton.x+backButton.w&&xMouse>=backButton.x)&&(yMouse&lt=backButton.y+backButton.h&&yMouse>=backButton.y))) {
+                        screen="menu";
+                        xMouse=0;
+                        yMouse=0;
+                    }
+                    if (windowEvent.button.button==SDL_BUTTON_LEFT&&((xMouse&lt=characters[0].x+characters[0].w&&xMouse>=characters[0].x)&&(yMouse&lt=characters[0].y+characters[0].h&&yMouse>=characters[0].y))) {
+                        if (player==NULL) player=new fighter(Dracaena,renderer);
+                        else enemy=new fighter(Dracaena,renderer);
+                    }
+                    if (windowEvent.button.button==SDL_BUTTON_LEFT&&((xMouse&lt=characters[1].x+characters[1].w&&xMouse>=characters[1].x)&&(yMouse&lt=characters[1].y+characters[1].h&&yMouse>=characters[1].y))) {
+                        if (player==NULL) player=new fighter(Richard,renderer); 
+                        else enemy=new fighter(Richard,renderer);
+                    }
+                    if (player!=NULL&&enemy!=NULL) {
+                        screen="game";
+                        unsigned threadID;
+                        (HANDLE)_beginthreadex(NULL, 0, &decreaseTimer, (void*)tptr, 0, &threadID);
+                    }
+                }
+            }
+            
+            //the actual fighting game code
+            if (screen=="game"){
+    
+                SDL_Surface * image = IMG_Load("background.png");//loading the background image
+                //this code is so they don't go infinitely in whatever direction they started in
+                player->buffer.velocity[0]=0;
+                enemy->buffer.velocity[0]=0;
+    
+                switch(windowEvent.type){
+                    case SDL_KEYDOWN:
+                        switch (windowEvent.key.keysym.sym){
+                            case SDLK_a:
+                                keys.a.pressed=true;
+                                player->lastKey='a';
+                                break;
+                            case SDLK_d:
+                                keys.d.pressed=true;
+                                player->lastKey='d';
+                                break;
+                            case SDLK_w:
+                                if (player->buffer.velocity[1]==0) player->buffer.velocity[1]=-player->jumpH;
+                                break;
+                            case SDLK_SPACE:
+                                if (enemy->target.x+enemy->target.w>player->target.x+player->target.w) player->attack();
+                                else player->attack("backwards");
+                                player->attackPress=false;
+                                //SDL_FillRect(image,&player->attackBox,0xFF0000FF);
+                                break;
+                            case SDLK_RIGHT:
+                                keys.ArrowRight.pressed=true;
+                                enemy->lastKey="ArrowRight";
+                                break;
+                            case SDLK_LEFT:
+                                keys.ArrowLeft.pressed=true;
+                                enemy->lastKey="ArrowLeft";
+                                break;
+                            case SDLK_UP:
+                                if (enemy->buffer.velocity[1]==0){
+                                    enemy->buffer.velocity[1]=-enemy->jumpH;
+                                }
+                                break;
+                            case SDLK_DOWN:
+                                if (player->target.x+player->target.w>enemy->target.x+enemy->target.w) enemy->attack();
+                                else enemy->attack("backwards");
+                                enemy->attackPress=false;
+                                //SDL_FillRect(image,&enemy->attackBox,0xFF0000FF);
+                                break;
+                        }
+                        break;
+                    case SDL_KEYUP:
+                        switch (windowEvent.key.keysym.sym){
+                            case SDLK_a:
+                                keys.a.pressed=false;
+                                break;
+                            case SDLK_d:
+                                keys.d.pressed=false;
+                                break;
+                            case SDLK_SPACE:
+                                player->attackPress=true;
+                                break;
+                            case SDLK_RIGHT:
+                                keys.ArrowRight.pressed=false;
+                                break;
+                            case SDLK_LEFT:
+                                keys.ArrowLeft.pressed=false;
+                                break;
+                            case SDLK_DOWN:
+                                enemy->attackPress=true;
+                                break;
+                        }
+                        break;
+                }
+    
+                //player movement
+                if (keys.a.pressed&&player->lastKey=="a"&&player->buffer.imageSrc!=player->buffer.sprites.takeHit.imageSrc&&player->buffer.velocity[1]==0) {
+                    player->buffer.velocity[0]=-player->speed;
+                    player->jumpArc=-player->speed;
+                    player->switchSprite(1,"backwards");
+                } else if (keys.d.pressed&&player->lastKey=="d"&&player->buffer.imageSrc!=player->buffer.sprites.takeHit.imageSrc&&player->buffer.velocity[1]==0) {
+                    player->buffer.velocity[0]=player->speed;
+                    player->jumpArc=player->speed;
+                    player->switchSprite(1);
+                }
+    
+                if (player->buffer.velocity[1]&lt0){
+                    if (player->jumpArc!=0) player->buffer.velocity[0]=player->jumpArc;
+                    if ((enemy->target.x+enemy->target.w>player->target.x+player->target.w&&player->buffer.velocity[0]==0)||player->buffer.velocity[0]>0) player->switchSprite(2);
+                    else player->switchSprite(2,"backwards");
+                } else if (player->buffer.velocity[1]>0){
+                    if (player->jumpArc!=0) player->buffer.velocity[0]=player->jumpArc;
+                    if ((enemy->target.x+enemy->target.w>player->target.x+player->target.w&&player->buffer.velocity[0]==0)||player->buffer.velocity[0]>0) player->switchSprite(3);
+                    else player->switchSprite(3,"backwards");
+                } else if (player->buffer.velocity[0]==0&&player->buffer.velocity[1]==0){
+                    if (enemy->target.x+enemy->target.w>player->target.x+player->target.w) player->switchSprite(0);
+                    else player->switchSprite(0,"backwards");
+                }
+    
+                //enemy movement
+                if (keys.ArrowLeft.pressed&&enemy->lastKey=="ArrowLeft"&&enemy->buffer.imageSrc!=enemy->buffer.sprites.takeHit.imageSrc&&enemy->buffer.velocity[1]==0) {
+                    enemy->buffer.velocity[0]=-enemy->speed;
+                    enemy->jumpArc=-enemy->speed;
+                    enemy->switchSprite(1,"backwards");
+                } else if (keys.ArrowRight.pressed&&enemy->lastKey=="ArrowRight"&&enemy->buffer.imageSrc!=enemy->buffer.sprites.takeHit.imageSrc&&enemy->buffer.velocity[1]==0) {
+                    enemy->buffer.velocity[0]=enemy->speed;
+                    enemy->jumpArc=enemy->speed;
+                    if (enemy->buffer.velocity[1]==0){
+                        enemy->switchSprite(1);
+                    }
+                }
+    
+                if (enemy->buffer.velocity[1]&lt0){
+                    if (enemy->jumpArc!=0) enemy->buffer.velocity[0]=enemy->jumpArc;
+                    if ((player->target.x+player->target.w>enemy->target.x+enemy->target.w&&enemy->buffer.velocity[0]==0)||enemy->buffer.velocity[0]>0) enemy->switchSprite(2);
+                    else enemy->switchSprite(2,"backwards");
+                } else if (enemy->buffer.velocity[1]>0){
+                    if (enemy->jumpArc!=0) enemy->buffer.velocity[0]=enemy->jumpArc;
+                    if ((player->target.x+player->target.w>enemy->target.x+enemy->target.w&&enemy->buffer.velocity[0]==0)||enemy->buffer.velocity[0]>0) enemy->switchSprite(3);
+                    else enemy->switchSprite(3,"backwards");
+                } else if (enemy->buffer.velocity[0]==0&&enemy->buffer.velocity[1]==0){
+                    if (player->target.x+player->target.w>enemy->target.x+enemy->target.w) enemy->switchSprite(0);
+                    else enemy->switchSprite(0,"backwards");
+                }
+    
+                //collision detection and hitting
+                if (rectangleCollision(player->attackBox,enemy->target)&&player->isAttacking&&player->currentFrame==player->buffer.attackStats.frame-1) {
+                    if (enemy->target.x+enemy->target.w>player->target.x+player->target.w) enemy->takeHit("backwards");
+                    else enemy->takeHit();
+                    player->isAttacking=false;
+                    healthBar2.w-=71;
+                }
+                if (rectangleCollision(enemy->attackBox,player->target)&&enemy->isAttacking&&enemy->currentFrame==enemy->buffer.attackStats.frame-1) {
+                    if (player->target.x+player->target.w>enemy->target.x+enemy->target.w) player->takeHit("backwards");
+                    else player->takeHit();
+                    enemy->isAttacking=false;
+                    healthBar1.x+=71;
+                    healthBar1.w-=71;
+                }
+                //the ui display stuff
+                SDL_FillRect(image,&healthBarBack1,0);
+                SDL_FillRect(image,&healthBarBack2,0);
+                SDL_FillRect(image,&timer,0xFF0000FF);
+                SDL_FillRect(image,&healthBar1,0xFFF00000);
+                SDL_FillRect(image,&healthBar2,0xFFF00000);
+    
+                //SDL_FillRect(image,&player->target,0xFF0000FF);//hitbox tracking temporary remove later
+                //SDL_FillRect(image,&enemy->target,0xFF0000FF);//hitbox tracking temporary remove later
+    
+                texture = SDL_CreateTextureFromSurface(renderer, image);//rendering the background
+                SDL_RenderCopy(renderer, texture, NULL, NULL);//placing the background
+    
+                //timer display shit
+                SDL_Surface* timerNum = TTF_RenderText_Solid(Sans, std::to_string(timerValue).c_str(), White); 
+                SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, timerNum);
+                SDL_RenderCopy(renderer, Message, NULL, &timer);
+    
+                //frame rate independence shit
+                float timeStep=stepTimer.getTicks()/1000.f;
+                //updating the fighters
+                player->update(timeStep);
+                enemy->update(timeStep);
+    
+                //Restart step timer
+                stepTimer.start();
+            
+                SDL_RenderPresent(renderer);
+                SDL_RenderClear(renderer);//might change this later, currently used so healthbar rects render properly
+                SDL_FreeSurface(image);
+                SDL_DestroyTexture(texture);
+                SDL_FreeSurface(timerNum);
+                SDL_DestroyTexture(Message);
+    
+                //finishing the game stuff
+                if (player->health&lt=0||enemy->health&lt=0||timerValue==0){
+                    if ((player->buffer.imageSrc==player->buffer.sprites.death.imageSrc||player->buffer.imageSrc==player->buffer.sprites.death.backwardsImg)&&player->currentFrame==player->buffer.sprites.death.framesMax-1){
+                        delete player;
+                        delete enemy;
+                        player=NULL;
+                        enemy=NULL;
+                        *tptr=60;
+                        healthBar1.w=355;
+                        healthBar1.x=healthBarBack1.x+5;
+                        healthBar1.y=healthBarBack1.y+5;
+                        healthBar1.h=40;
+                        healthBar2.w=355;
+                        healthBar2.x=container.x+5+healthBarBack1.w+70;
+                        healthBar2.y=healthBarBack2.y+5;
+                        healthBar2.h=40;
+                        SDL_Delay(1500);
+                        screen = "select";
+                    } else if ((enemy->buffer.imageSrc==enemy->buffer.sprites.death.imageSrc||enemy->buffer.imageSrc==enemy->buffer.sprites.death.backwardsImg)&&enemy->currentFrame==enemy->buffer.sprites.death.framesMax-1){
+                        delete player;
+                        delete enemy;
+                        player=NULL;
+                        enemy=NULL;
+                        *tptr=60;
+                        healthBar1.w=355;
+                        healthBar1.x=healthBarBack1.x+5;
+                        healthBar1.y=healthBarBack1.y+5;
+                        healthBar1.h=40;
+                        healthBar2.w=355;
+                        healthBar2.x=container.x+5+healthBarBack1.w+70;
+                        healthBar2.y=healthBarBack2.y+5;
+                        healthBar2.h=40;
+                        SDL_Delay(1500);
+                        screen = "select";
+                    }
+                }
+            }
+    
+        }
+        //cleanup
+        SDL_DestroyTexture(texture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        return 0;
+    }
 
-@bot.command(name='stop', help='Stops the song')
-async def stop(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_playing():
-        await voice_client.stop()
-    else:
-        await ctx.send("The bot is not playing anything at the moment.")
+    </pre>
+    <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p class="blurbs">
+    This is the code for the fighting game, although this was written in C++, the JavaScript version is playable on the "Games" tab. This was written in C++ with SDL2
+    It's basically the same as the one on the "Games" tab, however to give you the rundown, it has its own animation system, a proper timer, character select, and all the basic
+    mechanisms behind fighting games. This was fun to make as I had to work with my friends to implement the sprite work and characters. Some days I muse on improving on it and 
+    publishing it as a full-fledged game, but that's perhaps for another time
+</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<h2 class="labeler">Calculator</h2>
+<br>
+<br>
+<pre class="scroll">
+    #include &ltLiquidCrystal.h>
 
-@bot.command(name='yesb', help='Stops the song')
-async def yesb(ctx):
-    ben[0]=True
-
-@bot.command(name='nob', help='Stops the song')
-async def nob(ctx):
-    ben[0]=False
-
-
-
-bot.run(TOKEN)
+        String buffer="";
+        
+        String evaluate(String eq,int start, int end){
+         
+          int index=0;
+          String ptr[100];
+          String buffer="";
+          double answer=0;
+          for (int i=0;i&lteq.length();i++){
+            if (eq[i]!='+'&&eq[i]!='-'&&eq[i]!='*'&&eq[i]!='/') {
+              if (buffer[buffer.length()-1]=='.'&&eq[i]=='.') return "Syntax Error";
+              buffer+=eq[i];
+            } else {
+              ptr[index]=buffer;
+              index++;
+              String s(eq[i]);
+              ptr[index]=s;
+              index++;
+              buffer="";
+            }
+          }
+          ptr[index]=buffer;
+          index++;
+          String nextPos="";
+          String swapper=ptr[0];
+          if (ptr[0]!="-") {
+            for (int k = index; k > 0; k--){        
+                ptr[k]=ptr[k-1];
+            }
+            ptr[0]="+";
+            index++;
+          }
+          for (int i=0;i&ltindex;i++){
+            if (ptr[i]=="/"||ptr[i]=="*"){
+                String temp;
+                if (ptr[i]=="/") temp=String(ptr[i-1].toFloat()/ptr[i+1].toFloat());
+                else temp=String(ptr[i-1].toFloat()*ptr[i+1].toFloat());
+                for(int k = i+1,c=i; k < index; k++,c++) ptr[c] = ptr[k];
+                index--;
+                for(int k = i+1,c=i; k < index; k++,c++) ptr[c] = ptr[k];
+                index--;
+                ptr[i-1]=temp;
+                i--;
+            }
+          }
+          for (int i=0;i&ltindex;i++){
+            if (ptr[i]=="+"||ptr[i]=="-"){
+                if (ptr[i]=="+") answer+=ptr[i+1].toFloat();
+                else answer-=ptr[i+1].toFloat();
+                i++;
+            }
+          }
+          return String(answer);
+        }
+        
+        bool test(int pin){
+          if (digitalRead(pin)==HIGH) return true;
+          return false;
+        }
+        LiquidCrystal lcd(6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+        void setup() {
+          lcd.begin(16, 2);
+        }
+        bool activate=false;
+        void loop() {
+          if (test(2)&&!test(3)&&!test(4)&&!test(5)) {
+            buffer+=String('1');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }  
+          if (!test(2)&&test(3)&&!test(4)&&!test(5)) {
+            buffer+=String('2');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }  
+          if (test(2)&&test(3)&&!test(4)&&!test(5)) {
+            buffer+=String('3');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }  
+          if (!test(2)&&!test(3)&&test(4)&&!test(5)) {
+            buffer+=String('4');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }  
+          if (test(2)&&!test(3)&&test(4)&&!test(5)) {
+            buffer+=String('5');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          } 
+          if (!test(2)&&test(3)&&test(4)&&!test(5)) {
+            buffer+=String('6');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }   
+          if (test(2)&&test(3)&&test(4)&&!test(5)) {
+            buffer+=String('7');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }  
+          if (!test(2)&&!test(3)&&!test(4)&&test(5)) {
+            buffer+=String('8');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          } 
+          if (test(2)&&!test(3)&&!test(4)&&test(5)) {
+            buffer+=String('9');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          } 
+          if (!test(2)&&test(3)&&!test(4)&&test(5)) {
+            buffer+=String('0');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }
+          if (test(2)&&test(3)&&!test(4)&&test(5)) {
+            buffer+=String('+');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }
+          if (!test(2)&&!test(3)&&test(4)&&test(5)) {
+            buffer+=String('-');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }
+          if (test(2)&&!test(3)&&test(4)&&test(5)) {
+            buffer+=String('*');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }
+          if (!test(2)&&test(3)&&test(4)&&test(5)) {
+            buffer+=String('/');
+            delay(160);
+            lcd.clear();
+            lcd.print(buffer);
+          }
+          if (test(2)&&test(3)&&test(4)&&test(5)&&buffer!="") {
+            activate=true;
+          }
+          if (activate&&buffer!="") {
+            String temp=evaluate(buffer,0,buffer.length());
+            activate=false;
+            buffer="";
+            delay(160);
+            lcd.setCursor(0, 2);
+            lcd.print(temp);
+          }
+        
+        }
+        
     </pre>
     <br>
 <br>
@@ -868,12 +2152,16 @@ bot.run(TOKEN)
 <br>
 <br>
 <br>
-<p class="blurbs">This is discord bot, written in python. As of right now, this bot can currently play music, and respond to key messages. 
-    I'll progressively add stuff as time goes by but for now, this is a good start</p>
+<p class="blurbs">
+    This is a calculator I made using arduino. Yes a physical calculator I built. I used diodes to make a binary input system to save pin space. This is more of a foray
+    into hardware and more hardware based projects. Below is a photo of the calculator working, I was pretty proud of myself when it all came together even though a calculator 
+    has technically been done before
+</p>
 <br>
 <br>
 <br>
 <br>
+<img src="calculator.jpeg" style=" display:block;margin:0 auto 0 auto; width:800px; border-right-width: 20px;border-left-width: 20px; border-left-style: solid; border-right-style: solid;border-color: #e2d7c5"  />
 <br>
 <br>
 <br>
