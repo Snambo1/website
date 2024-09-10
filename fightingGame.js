@@ -306,7 +306,8 @@ healthbar.appendChild(playerHealth)
 healthbar.appendChild(timer)
 healthbar.appendChild(enemyHealth)
 containerDiv.appendChild(endgame)
-containerDiv.appendChild(document.createElement('canvas'))
+let canvas=document.createElement('canvas')
+containerDiv.appendChild(canvas)
 playerHealth.appendChild(playerHealthBar)
 playerHealth.appendChild(playerBackground)
 enemyHealth.appendChild(enemyHealthBar)
@@ -377,7 +378,6 @@ endgame.style.right='0'
 endgame.style.bottom='0'
 endgame.style.left='0'
 
-let canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 canvas.width = 1024
 canvas.height=576
