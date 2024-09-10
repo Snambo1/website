@@ -9,9 +9,58 @@
     <a href="games.html" class="hoverable">Games</a>
     <a href="index.html" class="hoverable">Home</a>
 </div>
+<div class="tails">
+	
+	<canvas id="canvas" width="170" height="500"></canvas>
+</div>
+<script>
+	let canvas=document.getElementById('canvas')
+	let c = canvas.getContext('2d')
+	c.strokeStyle = "black";
+	c.lineWidth=12
+	let start=-20
+	let reverse=true;
+	function draw(){
+		c.clearRect(0, 0, canvas.width, canvas.height);
+		c.beginPath()
+		c.moveTo(0,0)
+		let last=[50,0]
+		for (let i=start-10;i<400+start;i+=10) {
+			c.moveTo(Math.sin(i/12)*6+50,i-start);
+			c.lineTo(last[0],last[1])
+			last[0]=Math.sin(i/12)*6+50
+			last[1]=i-start
+			c.stroke();
+		}
+		last[0]=70
+		last[1]=0
+		for (let i=start-10,j=0;i<350+start;i+=10,j+=2) {
+			c.moveTo(Math.sin(i/12)*4+70+j,i-start);
+			c.lineTo(last[0],last[1])
+			last[0]=Math.sin(i/12)*4+70+j
+			last[1]=i-start
+			c.stroke();
+		}
+		c.closePath()
+		//c.clearRect(0, 0, canvas.width, canvas.height);
+		if (!reverse) start++
+		else start--;
+		if (start==0) reverse=true
+		else if (start==-20) reverse=false
+		window.requestAnimationFrame(draw)
+		//c.clearRect(0, 0, canvas.width, canvas.height);
+	}
+	/*for (let i=-10;i<0;i++) {
+		draw(i)
+		if (i==-1) i=-10
+	}*/
+	window.requestAnimationFrame(draw)
+</script>
 <h1 id="title">PORT HEADBAND</h1>
-<hr class="liner">
-<hr class="liner">
+<body>
+	<ul class="other-pages">
+	</ul>
+<br>
 <ul class="other-pages">
 </ul>
 <br>
