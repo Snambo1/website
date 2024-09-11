@@ -244,12 +244,9 @@ puzzleSquare {
 
 footer {
   	background-color: black;
-  	position: absolute;
   	width: 100%;
   	bottom: 0;
   	display: flex; 
-  	justify-content: left;
-  	display: flex;
 }
 @font-face{font-family: botw; src:url("The Wild Breath of Zelda.otf");}
 @font-face{font-family: mgs; src:url("METAG___.TTF");}
