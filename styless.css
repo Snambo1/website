@@ -246,6 +246,10 @@ footer {
 	background-color: black;
 	overflow: hidden;
 	width: 100%;
+	margin: 0 auto;
+  	display: flex; 
+  	justify-content: left;
+  	display: flex;
 }
 @font-face{font-family: botw; src:url("The Wild Breath of Zelda.otf");}
 @font-face{font-family: mgs; src:url("METAG___.TTF");}
