@@ -243,9 +243,9 @@ puzzleSquare {
 }
 
 footer {
+	width: 100%;
 	background-color: black;
 	overflow: hidden;
-	width: 100%;
 	margin: 0 auto;
   	display: flex; 
   	justify-content: left;
