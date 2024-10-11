@@ -223,10 +223,10 @@ puzzleSquare {
 }
 
 .gridImage {
-	min-height: 300px;
-	min-width: 300px;
-	height: 300px;
-	width: 300px;
+	min-height: 200px;
+	min-width: 200px;
+	height: 200px;
+	width: 200px;
 	border: 10px #e2d7c5 solid;
 	border-radius: 20px;
 }
