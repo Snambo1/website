@@ -11,13 +11,14 @@
 </div>
 <div class="tails">
 	
-	<canvas id="canvas" width="170" height="500"></canvas>
+	<canvas id="canvas" width="200" height="500"></canvas>
 </div>
 <script>
 	let canvas=document.getElementById('canvas')
 	let c = canvas.getContext('2d')
 	c.strokeStyle = "black";
-	c.lineWidth=12
+	c.lineWidth=25
+	c.lineCap = 'round';
 	let start=-20
 	let reverse=true;
 	function draw(){
@@ -25,8 +26,8 @@
 		c.beginPath()
 		c.moveTo(0,0)
 		let last=[50,0]
-		for (let i=start-10;i<400+start;i+=10) {
-			c.moveTo(Math.sin(i/12)*6+50,i-start);
+		for (let i=start-10,j=0;i<400+start;i+=10,j++) {
+			c.moveTo(Math.sin(i/12)*6+50+j,i-start);
 			c.lineTo(last[0],last[1])
 			last[0]=Math.sin(i/12)*6+50
 			last[1]=i-start
@@ -34,8 +35,8 @@
 		}
 		last[0]=70
 		last[1]=0
-		for (let i=start-10,j=0;i<350+start;i+=10,j+=2) {
-			c.moveTo(Math.sin(i/12)*4+70+j,i-start);
+		for (let i=start-10,j=0,x=0;i<350+start;i+=10,j+=2,x++) {
+			c.moveTo(Math.sin(i/12)*4+70+j+x,i-start);
 			c.lineTo(last[0],last[1])
 			last[0]=Math.sin(i/12)*4+70+j
 			last[1]=i-start
@@ -57,28 +58,91 @@
 	window.requestAnimationFrame(draw)
 </script>
 <h1 id="title">PORT HEADBAND</h1>
-<body>
-	<ul class="other-pages">
-	</ul>
-<br>
 <ul class="other-pages">
 </ul>
-
+<style>
+/*.wrapper img {
+  position: absolute;
+  margin: 0;
+  animation: marquee 5s linear infinite;
+}*/
+@keyframes marqueel {
+  0% { transform:  translateX(0%);  }
+  100%{ transform: translateX(-100%); }
+}
+@keyframes marqueer {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+</style>
 <h2 style="text-align: center;">Reviews</h2>
 <br>
-<p class="blurbs">These are some of the things I've reviewed, simply click on a piece of media and it'll take you to the review for it, and then just scroll up
+<div id="reviewScroll" style="width: 800px; margin: 0 auto 0 auto; position: relative; container-type: inline-size;overflow: hidden;">
+	<div style="display:flex; position: relative; container-type: inline-size;animation: marqueel 5s infinite;">
+		<img src="" id="revScroll1"class="gridImage hoverable" onclick="finder(scrollList[0]); scrollToElement('#reviewSpot', 600)">
+		<img src="" id="revScroll2"class="gridImage hoverable" onclick="finder(scrollList[1]); scrollToElement('#reviewSpot', 600)">
+	
+		<img src="" id="revScroll3"class="gridImage hoverable" onclick="finder(scrollList[2]); scrollToElement('#reviewSpot', 600)">
+		<img src="" id="revScroll4"class="gridImage hoverable" onclick="finder(scrollList[3]); scrollToElement('#reviewSpot', 600)">
+		<img src="" id="revScroll5"class="gridImage hoverable" onclick="finder(scrollList[0]); scrollToElement('#reviewSpot', 600)">
+		<img src="" id="revScroll6"class="gridImage hoverable" onclick="finder(scrollList[1]); scrollToElement('#reviewSpot', 600)">
+	
+		<img src="" id="revScroll7"class="gridImage hoverable" onclick="finder(scrollList[2]); scrollToElement('#reviewSpot', 600)">
+		<img src="" id="revScroll8"class="gridImage hoverable" onclick="finder(scrollList[3]); scrollToElement('#reviewSpot', 600)">
+		
+	</div>
+<!--<div style="display:flex; position: relative; container-type: inline-size;animation: marqueer 1s infinite;">
+	<img src="TheRoad.jpg" class="gridImage hoverable" >
+	<img src="1984.jpg" class="gridImage hoverable" >
+	<img src="musashi.jpg" class="gridImage hoverable">
+	<img src="odyssey.jpg" class="gridImage hoverable">
+	<img src="TheRoad.jpg" class="gridImage hoverable" >
+		<img src="1984.jpg" class="gridImage hoverable" >
+	
+		<img src="musashi.jpg" class="gridImage hoverable" >
+		<img src="odyssey.jpg" class="gridImage hoverable" >
+</div>-->
+ 
+
+</div>
+<br>
+<br>
+<div id="reviewTitles" style="width: max-content;
+display: grid;
+column-gap: 100px;
+grid-template-columns: repeat(3, 300px);
+margin: 0 auto 0 auto;
+height: max-content;">
+<h2>RECENT REVIEW</h2>
+<h2>RANDOM REVIEW</h2>
+<h2>RECOMMENDED REVIEW</h2>
+
+</div>
+<div id="reviewGrid">
+	<img src="" id ="revHigh1"class="gridImage hoverable" onclick="finder(highlights[2]); scrollToElement('#reviewSpot', 600)">
+	<img src="" id="revHigh2"class="gridImage hoverable" onclick="finder(highlights[1]); scrollToElement('#reviewSpot', 600)">
+	<img src="" id="revHigh3"class="gridImage hoverable" onclick="finder(highlights[0]); scrollToElement('#reviewSpot', 600)">
+  </div>
+  <br>
+  <br>
+  
+  <form  id="form" align="center"> 
+	  <input input="text" id="query" name="q" placeholder="Search...">
+	  <button type="button" onclick="searcher(document.getElementById('query').value); scrollToElement('#reviewSpot', 600); ">Search</button>
+	</form>
+<!--<p class="blurbs">These are some of the things I've reviewed, simply click on a piece of media and it'll take you to the review for it, and then just scroll up
   and select a new review when you're done
 </p>
 <br>
 <br>
-<!--whenever you add a new review, EDIT THE FUCKING CSS 'REPEAT' UNDER THE ID, TRUST ME, IT WILL SAVE YOU LITERAL FUCKING HOURS-->
+whenever you add a new review, EDIT THE FUCKING CSS 'REPEAT' UNDER THE ID, TRUST ME, IT WILL SAVE YOU LITERAL FUCKING HOURS
 <div id="reviewGrid">
   <img src="1984.jpg" class="gridImage hoverable" onclick="finder('1984.jpg'); scrollToElement('#reviewSpot', 600)">
   <img src="blood meridian.jpg" class="gridImage hoverable" onclick="finder('blood meridian.jpg'); scrollToElement('#reviewSpot', 600)">
   <img src="musashi.jpg" class="gridImage hoverable" onclick="finder('musashi.jpg'); scrollToElement('#reviewSpot', 600)">
   <img src="odyssey.jpg" class="gridImage hoverable" onclick="finder('odyssey.jpg'); scrollToElement('#reviewSpot', 600)">
   <img src="TheRoad.jpg" class="gridImage hoverable" onclick="finder('TheRoad.jpg'); scrollToElement('#reviewSpot', 600)">
-</div>
+</div>-->
 
 <div id="reviewSpot">
   <br>
@@ -87,13 +151,13 @@
   <br>
   <br>
   <p id="revText"></p>
+  <h2 id="revScore"></h2>
 </div>
-
 <br>
 <br>
 <br>
-<footer><img src="penisforeskinicon.JPG" alt="penisforeskin" id="bestimage" style='animation-name:anime; animation-duration: 1s;animation-iteration-count: infinite;
-	'onclick="new Audio('killyourself.mp3').play()"></footer>
+<div class="foot"><img src="penisforeskinicon.JPG" alt="penisforeskin" id="bestimage" style='animation-name:anime; animation-duration: 1s;animation-iteration-count: infinite;
+	'onclick=""></div>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="reviewsPage.js"></script>
 </body>
