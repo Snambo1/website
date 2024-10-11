@@ -243,6 +243,7 @@ puzzleSquare {
 }
 
 .foot {
+	overflow: hidden;
 	background-color: black;
   	width: 100%;
   	bottom: 0;
