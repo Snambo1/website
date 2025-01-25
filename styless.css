@@ -4,8 +4,7 @@
 	font-family: botw;
 }
 body {
-	margin: 0; /* Remove any default margin to avoid gaps */
-    	padding-bottom: 60px; /* Add space for the footer to prevent overlapping content */
+	margin: 0;
 	position: relative;
 }
 
@@ -243,18 +242,14 @@ puzzleSquare {
   	margin-right: auto;
 }
 .foot {
-    position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        background-color: #e2d7c5; /* Background color of the footer */
-        height: 80px; /* Adjust height as needed */
+        background-color: black;
         text-align: center;
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 10; /* Ensures it stays above other elements */
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for a better look */
   }
 @font-face{font-family: botw; src:url("The Wild Breath of Zelda.otf");}
 @font-face{font-family: mgs; src:url("METAG___.TTF");}
