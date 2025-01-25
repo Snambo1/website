@@ -244,13 +244,17 @@ puzzleSquare {
 }
 .foot {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: black; /* Adjust the color as needed */
-    text-align: center;
-    padding: 10px 0; /* Optional: Add some padding for spacing */
-    z-index: 10; /* Ensure it stays above other elements */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #e2d7c5; /* Background color of the footer */
+        height: 80px; /* Adjust height as needed */
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10; /* Ensures it stays above other elements */
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for a better look */
   }
 @font-face{font-family: botw; src:url("The Wild Breath of Zelda.otf");}
 @font-face{font-family: mgs; src:url("METAG___.TTF");}
