@@ -241,5 +241,16 @@ puzzleSquare {
   	margin-left: auto;
   	margin-right: auto;
 }
+.foot {
+    width: 100%;
+    position: fixed; /* Ensures the footer stays at the bottom of the viewport */
+    bottom: 0;
+    left: 0;
+    background-color: #fed9ff; /* Adjust the background color to fit your design */
+    height: 60px; /* Adjust the height as needed */
+    display: flex;
+    justify-content: center; /* Centers the content horizontally */
+    align-items: center; /* Centers the content vertically */
+  }
 @font-face{font-family: botw; src:url("The Wild Breath of Zelda.otf");}
 @font-face{font-family: mgs; src:url("METAG___.TTF");}
