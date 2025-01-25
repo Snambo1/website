@@ -4,7 +4,8 @@
 	font-family: botw;
 }
 body {
-	margin: 0;
+	margin: 0; /* Remove any default margin to avoid gaps */
+    	padding-bottom: 60px; /* Add space for the footer to prevent overlapping content */
 	position: relative;
 }
 
